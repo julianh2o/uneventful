@@ -9,9 +9,11 @@ import {
 	SettingsOutlined as SettingsIcon,
 	ListAlt as ListIcon,
 	CreditCard as BillingIcon,
+	Event as EventIcon,
 } from '@mui/icons-material';
 
 import { Home } from '../pages/Home';
+import { EventRegistration } from '../pages/EventRegistration';
 
 import { Route } from '../types/Route';
 
@@ -24,6 +26,15 @@ const routes: Array<Route> = [
 		path: '/',
 		isEnabled: true,
 		icon: HomeIcon,
+	},
+	{
+		key: 'router-event-registration',
+		title: 'Event Registration',
+		description: 'Register for an event',
+		component: EventRegistration,
+		path: '/register',
+		isEnabled: true,
+		icon: EventIcon,
 		appendDivider: true,
 	},
 	{

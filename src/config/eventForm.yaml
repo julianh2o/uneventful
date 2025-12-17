@@ -1,0 +1,84 @@
+title: Event Registration
+description: |
+  Please fill out the form below to register your event.
+  **All fields are required** unless marked optional.
+
+pages:
+  - title: Basic Information
+    description: Tell us about your event and who's hosting it.
+    fields:
+      - id: eventName
+        type: text
+        label: Event Name
+        placeholder: Enter your event name
+        required: true
+
+      - id: hostName
+        type: text
+        label: Host Name
+        placeholder: Enter the host's full name
+        required: true
+
+      - id: hostContact
+        type: text
+        label: Host Contact
+        placeholder: Email or phone number
+        required: true
+        helperText: We'll use this to send confirmation details.
+
+  - title: Event Details
+    description: Provide details about the size and timing of your event.
+    fields:
+      - id: eventDate
+        type: text
+        label: Event Date
+        placeholder: MM/DD/YYYY
+        required: true
+
+      - id: eventTime
+        type: text
+        label: Event Time
+        placeholder: e.g., 6:00 PM
+        required: true
+
+      - id: partySize
+        type: select
+        label: Party Size
+        required: true
+        options:
+          - value: "1-10"
+            label: "1-10 guests"
+          - value: "11-20"
+            label: "11-20 guests"
+          - value: "21-50"
+            label: "21-50 guests"
+          - value: "51-100"
+            label: "51-100 guests"
+          - value: "100+"
+            label: "More than 100 guests"
+
+      - id: largePartyAgreement
+        type: checkbox
+        label: Large Party Agreement
+        description: |
+          By checking this box, I acknowledge and agree to the following:
+
+          - **Additional fees** may apply for parties over 20 guests
+          - A **dedicated coordinator** will be assigned to your event
+          - **48-hour cancellation notice** is required for large parties
+        checkboxLabel: I Agree
+        required: true
+        condition:
+          field: partySize
+          operator: in
+          values:
+            - "21-50"
+            - "51-100"
+            - "100+"
+
+      - id: specialRequests
+        type: text
+        label: Special Requests
+        placeholder: Any dietary restrictions, accessibility needs, etc.
+        required: false
+        helperText: Optional - let us know how we can accommodate your guests.

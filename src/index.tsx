@@ -5,6 +5,25 @@ import { Helmet } from 'react-helmet';
 import App from './App';
 
 import { APP_TITLE, APP_DESCRIPTION } from './utils/constants';
+import { reportError } from './utils/errorReporter';
+
+window.onerror = (
+	message: string | Event,
+	_source?: string,
+	_lineno?: number,
+	_colno?: number,
+	error?: Error
+): boolean => {
+	reportError(error || String(message), 'runtime');
+	return false;
+};
+
+window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent) => {
+	const error = event.reason instanceof Error
+		? event.reason
+		: new Error(String(event.reason));
+	reportError(error, 'runtime');
+});
 
 ReactDOM.render(
 	<React.StrictMode>

@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
 import { Layout } from './components/Layout';
 import { PageDefault } from './components/PageDefault';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 import { AppContext, ThemeModeContext } from './contexts';
 import { AppClient } from './clients';
@@ -37,13 +38,15 @@ function App() {
 				<ThemeProvider theme={theme}>
 					<CssBaseline />
 					<Router>
-						<Switch>
-							<Layout>
-								{routes.map((route: AppRoute) =>
-									route.subRoutes ? route.subRoutes.map((item: AppRoute) => addRoute(item)) : addRoute(route)
-								)}
-							</Layout>
-						</Switch>
+						<ErrorBoundary>
+							<Switch>
+								<Layout>
+									{routes.map((route: AppRoute) =>
+										route.subRoutes ? route.subRoutes.map((item: AppRoute) => addRoute(item)) : addRoute(route)
+									)}
+								</Layout>
+							</Switch>
+						</ErrorBoundary>
 					</Router>
 				</ThemeProvider>
 			</ThemeModeContext.Provider>

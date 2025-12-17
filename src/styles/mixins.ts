@@ -1,4 +1,4 @@
-import { CSSObject, Theme } from '@mui/material';
+import { CSSObject, Theme } from '@mui/material/styles';
 import { DRAWER_WIDTH } from '../utils/constants';
 
 export const navOpenedMixin = (theme: Theme): CSSObject => ({
