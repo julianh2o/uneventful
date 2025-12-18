@@ -15,20 +15,30 @@ import {
   Stepper,
   Step,
   StepLabel,
+  FormGroup,
+  FormLabel,
+  FormHelperText,
 } from '@mui/material';
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 
 import { FormConfig, FormField, FormFieldCondition, FormPage } from '../../types/FormConfig';
 
 interface DynamicFormProps {
   config: FormConfig;
+  initialValues?: Record<string, string | boolean>;
   onSubmit?: (values: Record<string, string | boolean>) => void;
 }
 
-export const DynamicForm = ({ config, onSubmit }: DynamicFormProps) => {
-  const [values, setValues] = useState<Record<string, string | boolean>>({});
+export const DynamicForm = ({ config, initialValues, onSubmit }: DynamicFormProps) => {
+  const [values, setValues] = useState<Record<string, string | boolean>>(initialValues || {});
   const [currentPage, setCurrentPage] = useState(0);
+
+  // Reset form when initialValues changes (e.g., editing a different item)
+  useEffect(() => {
+    setValues(initialValues || {});
+    setCurrentPage(0);
+  }, [initialValues]);
 
   // Normalize config to always work with pages
   const pages: FormPage[] = useMemo(() => {
@@ -58,6 +68,19 @@ export const DynamicForm = ({ config, onSubmit }: DynamicFormProps) => {
     (condition: FormFieldCondition): boolean => {
       const fieldValue = values[condition.field];
 
+      // Helper to parse JSON array from checkboxGroup
+      const parseArrayValue = (val: unknown): string[] => {
+        if (!val) return [];
+        if (typeof val === 'string') {
+          try {
+            return JSON.parse(val);
+          } catch {
+            return [];
+          }
+        }
+        return [];
+      };
+
       switch (condition.operator) {
         case 'in':
           return condition.values?.includes(fieldValue as string) ?? false;
@@ -65,6 +88,16 @@ export const DynamicForm = ({ config, onSubmit }: DynamicFormProps) => {
           return fieldValue === condition.value;
         case 'notEquals':
           return fieldValue !== condition.value;
+        case 'contains': {
+          // Check if checkboxGroup contains a specific value
+          const arrayValue = parseArrayValue(fieldValue);
+          return condition.value ? arrayValue.includes(condition.value) : false;
+        }
+        case 'containsAny': {
+          // Check if checkboxGroup contains any of the specified values
+          const arrayValue = parseArrayValue(fieldValue);
+          return condition.values?.some((v) => arrayValue.includes(v)) ?? false;
+        }
         default:
           return true;
       }
@@ -174,6 +207,61 @@ export const DynamicForm = ({ config, onSubmit }: DynamicFormProps) => {
             />
           </Box>
         );
+
+      case 'checkboxGroup': {
+        const selectedValues: string[] = (() => {
+          const val = values[field.id];
+          if (!val) return [];
+          if (typeof val === 'string') {
+            try {
+              return JSON.parse(val);
+            } catch {
+              return [];
+            }
+          }
+          return [];
+        })();
+
+        const handleCheckboxGroupChange = (optionValue: string, checked: boolean) => {
+          const newValues = checked
+            ? [...selectedValues, optionValue]
+            : selectedValues.filter((v) => v !== optionValue);
+          handleChange(field.id, JSON.stringify(newValues));
+        };
+
+        return (
+          <FormControl key={field.id} component="fieldset" sx={{ my: 2, display: 'block' }}>
+            <FormLabel component="legend">{field.label}</FormLabel>
+            {field.description && (
+              <Box
+                sx={{ mb: 1 }}
+                css={css`
+                  & p {
+                    margin: 0.5em 0;
+                  }
+                `}
+              >
+                <ReactMarkdown>{field.description}</ReactMarkdown>
+              </Box>
+            )}
+            <FormGroup>
+              {field.options?.map((option) => (
+                <FormControlLabel
+                  key={option.value}
+                  control={
+                    <Checkbox
+                      checked={selectedValues.includes(option.value)}
+                      onChange={(e) => handleCheckboxGroupChange(option.value, e.target.checked)}
+                    />
+                  }
+                  label={option.label}
+                />
+              ))}
+            </FormGroup>
+            {field.helperText && <FormHelperText>{field.helperText}</FormHelperText>}
+          </FormControl>
+        );
+      }
 
       default:
         return null;

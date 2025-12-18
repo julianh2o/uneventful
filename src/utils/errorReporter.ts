@@ -1,3 +1,5 @@
+import { getApiBaseUrl } from './api';
+
 export type ErrorType = 'runtime' | 'react' | 'api';
 
 export interface ErrorReport {
@@ -8,8 +10,6 @@ export interface ErrorReport {
   type: ErrorType;
   componentStack?: string;
 }
-
-const ERROR_ENDPOINT = '/api/errors';
 
 export const reportError = async (
   error: Error | string,
@@ -26,7 +26,7 @@ export const reportError = async (
       componentStack,
     };
 
-    await fetch(ERROR_ENDPOINT, {
+    await fetch(`${getApiBaseUrl()}/api/errors`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

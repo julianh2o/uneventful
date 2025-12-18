@@ -52,7 +52,7 @@ export type Route = {
 	 * @example
 	 * "<Dashboard />"
 	 */
-	component?: FC<{}>;
+	component?: FC<any>;
 
 	/**
 	 * The status of the route

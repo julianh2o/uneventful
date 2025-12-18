@@ -5,6 +5,9 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import { PageDefault } from './components/PageDefault';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { EventDashboard } from './pages/EventDashboard';
+import { TaskDetail } from './pages/TaskDetail';
+import { EventRegistration } from './pages/EventRegistration';
 
 import { AppContext, ThemeModeContext } from './contexts';
 import { AppClient } from './clients';
@@ -39,13 +42,18 @@ function App() {
 					<CssBaseline />
 					<Router>
 						<ErrorBoundary>
-							<Switch>
-								<Layout>
+							<Layout>
+								<Switch>
+									<Route path="/event/:id/task/:taskId" component={TaskDetail} exact />
+									<Route path="/event/:id/edit" exact>
+										<EventRegistration editMode />
+									</Route>
+									<Route path="/event/:id" component={EventDashboard} exact />
 									{routes.map((route: AppRoute) =>
 										route.subRoutes ? route.subRoutes.map((item: AppRoute) => addRoute(item)) : addRoute(route)
 									)}
-								</Layout>
-							</Switch>
+								</Switch>
+							</Layout>
 						</ErrorBoundary>
 					</Router>
 				</ThemeProvider>

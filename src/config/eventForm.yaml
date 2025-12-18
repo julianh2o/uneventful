@@ -1,7 +1,6 @@
 title: Event Registration
 description: |
-  Please fill out the form below to register your event.
-  **All fields are required** unless marked optional.
+  So you'd like to host an event at the Bawdy Shop? Great! We'd love to have your event here. This questionnaire lets us get a sense for the shape of your event so that we can set our expectations appropriately, communicate effectively, and facilitate accordingly!
 
 pages:
   - title: Basic Information
@@ -57,16 +56,130 @@ pages:
           - value: "100+"
             label: "More than 100 guests"
 
+      - id: specialRequests
+        type: text
+        label: Special Requests
+        placeholder: Any dietary restrictions, accessibility needs, etc.
+        required: false
+        helperText: Optional - let us know how we can accommodate your guests.
+
+  - title: Invitation Policy
+    description: |
+      The Bawdy Shop has a few different levels of engagement. By default any event placed on the calendar is open to all members of the **Bawdy Besties**, a group of about 15 people who have increased stewardship of the space.
+
+      In addition, the **Bawdy Buddies** represents a larger group of people who have been to the Bawdy Shop for a previous event and expressed interest in future large events. If you are trying to increase your reach, consider inviting the Bawdy Buddies.
+
+      Otherwise inviting the Bawdy Besties can provide internal appreciation and facilitation resources. **Private events** are also welcome, though in most cases, there will be at least one facilitator from the Bawdy Besties on site as a resource.
+    fields:
+      - id: invitationLevel
+        type: select
+        label: Who would you like to invite?
+        required: true
+        options:
+          - value: "private"
+            label: "Private (I will pick and choose all invitees)"
+          - value: "besties"
+            label: "Open to Bawdy Besties"
+          - value: "buddies"
+            label: "Blast to all Bawdy Buddies"
+
+      - id: plusOnePolicy
+        type: text
+        label: "+1 Policy"
+        placeholder: Describe your +1 policy...
+        required: true
+        helperText: Describe in detail the +1 policy. Number permitted, communication requirements, RSVP tracking, etc.
+
+  - title: Space Use
+    description: Select which areas of the Bawdy Shop you plan to use for your event.
+    fields:
+      - id: spaceUse
+        type: checkboxGroup
+        label: Which spaces will your event use?
+        required: true
+        options:
+          - value: "pool"
+            label: "Pool"
+          - value: "hot-tub"
+            label: "Hot Tub"
+          - value: "flat-top"
+            label: "Flat Top"
+          - value: "smokers-corner"
+            label: "Smokers Corner (behind kitchen)"
+          - value: "kitchen-snacks"
+            label: "Kitchen (snacks only, no dishes)"
+          - value: "kitchen-food"
+            label: "Kitchen (food, but no cooking)"
+          - value: "kitchen-cooking"
+            label: "Kitchen (cooking)"
+          - value: "bar"
+            label: "Bar (keg/alcohol)"
+          - value: "dance-floor"
+            label: "Dance Floor (near DJ stand)"
+          - value: "living-room"
+            label: "Living Room"
+          - value: "office"
+            label: "Office"
+          - value: "red-room"
+            label: "Red Room"
+
+  - title: Use Considerations
+    description: Based on your selections, please review and agree to the following considerations.
+    fields:
+      - id: kitchenAgreement
+        type: checkbox
+        label: Kitchen Use Agreement
+        description: |
+          By using the kitchen, you agree to the following:
+
+          - **Clean as you go** - All dishes, utensils, and surfaces must be cleaned immediately after use
+          - **No dishes left overnight** - Everything must be washed, dried, and put away before leaving
+          - **Shared space respect** - The kitchen is shared; leave it cleaner than you found it
+          - **Appliance care** - Report any issues with appliances immediately to a Bawdy Bestie
+          - **Food labeling** - Any food left in the fridge must be clearly labeled with your name and event date
+        checkboxLabel: I Agree to the Kitchen Use Terms
+        required: true
+        condition:
+          field: spaceUse
+          operator: containsAny
+          values:
+            - "kitchen-snacks"
+            - "kitchen-food"
+            - "kitchen-cooking"
+
+      - id: hotTubAgreement
+        type: checkbox
+        label: Hot Tub Use Agreement
+        description: |
+          By using the hot tub, you agree to the following:
+
+          - **Shower before entering** - All guests must rinse off before getting in the hot tub
+          - **No glass** - Absolutely no glass containers near or in the hot tub area
+          - **Capacity limit** - Maximum 8 people in the hot tub at once
+          - **Supervision** - A sober person must be designated to monitor hot tub use
+          - **Cover replacement** - The hot tub cover must be replaced when not in active use
+          - **No food or drinks in the water** - Keep all consumables on the deck
+          - **Report issues** - Notify a Bawdy Bestie immediately if water appears cloudy or equipment malfunctions
+        checkboxLabel: I Agree to the Hot Tub Use Terms
+        required: true
+        condition:
+          field: spaceUse
+          operator: contains
+          value: "hot-tub"
+
       - id: largePartyAgreement
         type: checkbox
         label: Large Party Agreement
         description: |
-          By checking this box, I acknowledge and agree to the following:
+          For parties over 20 guests, you acknowledge and agree to the following:
 
           - **Additional fees** may apply for parties over 20 guests
-          - A **dedicated coordinator** will be assigned to your event
+          - A **dedicated coordinator** from the Bawdy Besties will be assigned to your event
           - **48-hour cancellation notice** is required for large parties
-        checkboxLabel: I Agree
+          - **Guest list** - You must provide a guest list 24 hours before the event
+          - **Parking coordination** - Large events require a parking plan to avoid neighborhood disruption
+          - **Noise management** - Music must be kept at reasonable levels, especially after 10 PM
+        checkboxLabel: I Agree to the Large Party Terms
         required: true
         condition:
           field: partySize
@@ -75,10 +188,3 @@ pages:
             - "21-50"
             - "51-100"
             - "100+"
-
-      - id: specialRequests
-        type: text
-        label: Special Requests
-        placeholder: Any dietary restrictions, accessibility needs, etc.
-        required: false
-        helperText: Optional - let us know how we can accommodate your guests.

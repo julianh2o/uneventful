@@ -1,0 +1,40 @@
+tasks:
+  - id: calendar-event
+    name: Create Calendar Event
+    description: Add the event to the shared calendar with all relevant details and invite key stakeholders.
+    deadline: 14
+    subtasks:
+      - Create calendar entry with date and time
+      - Add event location and description
+      - Invite key stakeholders
+      - Set up reminders
+
+  - id: event-poster
+    name: Create Event Poster
+    description: Design and finalize promotional materials including digital poster and social media graphics.
+    deadline: 10
+    subtasks:
+      - Draft poster design concept
+      - Add event details and branding
+      - Create social media graphics
+      - Get approval from stakeholders
+
+  - id: send-invites
+    name: Send Invites
+    description: Send out invitations to all guests via email or preferred communication channel.
+    deadline: 7
+    subtasks:
+      - Compile guest list
+      - Draft invitation message
+      - Send invitations
+      - Track RSVPs
+
+  - id: space-reset
+    name: Space Reset
+    description: Clean up the venue, return furniture to original positions, and dispose of any waste.
+    deadline: -1
+    subtasks:
+      - Remove decorations
+      - Return furniture to original positions
+      - Dispose of waste and recycling
+      - Final walkthrough inspection

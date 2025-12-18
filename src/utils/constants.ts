@@ -1,7 +1,7 @@
 // APP TEXT
-export const APP_TITLE = 'Welcome, Developer App';
-export const APP_DESCRIPTION = 'React TypeScript Material-UI boilerplate by Welcome, Developer.';
-export const FOOTER_TEXT = `${new Date().getFullYear()} Proudly made in New Zealand by Dan Castro`;
+export const APP_TITLE = 'EVENTually';
+export const APP_DESCRIPTION = 'EVENTually - Your event management solution';
+export const FOOTER_TEXT = `© ${new Date().getFullYear()} EVENTually`;
 // PAGES TITLE
 export const PAGE_TITLE_HOME = 'Home';
 export const PAGE_TITLE_DASHBOARD = 'Dashboard';

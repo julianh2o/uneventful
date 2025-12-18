@@ -5,14 +5,14 @@ export interface FormFieldOption {
 
 export interface FormFieldCondition {
   field: string;
-  operator: 'in' | 'equals' | 'notEquals';
+  operator: 'in' | 'equals' | 'notEquals' | 'contains' | 'containsAny';
   values?: string[];
   value?: string;
 }
 
 export interface FormField {
   id: string;
-  type: 'text' | 'select' | 'checkbox';
+  type: 'text' | 'select' | 'checkbox' | 'checkboxGroup';
   label: string;
   placeholder?: string;
   required?: boolean;
