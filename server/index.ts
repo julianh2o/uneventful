@@ -3,11 +3,11 @@ import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import YAML from 'yaml';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// tsx provides __dirname polyfill in ESM mode
+const currentDir = __dirname;
 import { startReminderJob } from './reminderJob';
 import {
   generateMagicLinkToken,
@@ -26,8 +26,9 @@ import {
 import { sendSms } from './sms';
 import { isRateLimited, incrementRateLimit, getRateLimitResetTime } from './rateLimit';
 import { authenticateToken } from './middleware/auth';
+import { isAdmin } from './adminConfig';
 
-const EVENTS_FILE = path.join(__dirname, '..', 'data', 'events.json');
+const EVENTS_FILE = path.join(currentDir, '..', 'data', 'events.json');
 
 interface Event {
   id: string;
@@ -65,7 +66,7 @@ app.use(express.json());
 
 // Serve static files from the React app build directory in production
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '..', 'build')));
+  app.use(express.static(path.join(currentDir, '..', 'build')));
 }
 
 // Initialize users file
@@ -267,7 +268,7 @@ app.get('/api/auth/me', authenticateToken, (req, res) => {
       phone: user.phone,
       email: user.email,
       isActive: user.isActive,
-      isAdmin: user.isAdmin,
+      isAdmin: isAdmin(user.phone),
       isVerified: user.isVerified,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
@@ -281,7 +282,7 @@ app.get('/api/auth/me', authenticateToken, (req, res) => {
 // Endpoint to get form configuration
 app.get('/api/forms/:formName', (req, res) => {
   const { formName } = req.params;
-  const yamlPath = path.join(__dirname, '..', 'src', 'config', `${formName}.yaml`);
+  const yamlPath = path.join(currentDir, '..', 'src', 'config', `${formName}.yaml`);
 
   try {
     if (!fs.existsSync(yamlPath)) {
@@ -300,7 +301,7 @@ app.get('/api/forms/:formName', (req, res) => {
 
 // Endpoint to get tasks configuration
 app.get('/api/tasks', (_req, res) => {
-  const yamlPath = path.join(__dirname, '..', 'src', 'config', 'tasks.yaml');
+  const yamlPath = path.join(currentDir, '..', 'src', 'config', 'tasks.yaml');
 
   try {
     if (!fs.existsSync(yamlPath)) {
@@ -430,10 +431,10 @@ app.post('/api/errors', (req, res) => {
 // Catch-all route to serve React app for client-side routing
 // This must be after all API routes
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, '..', 'build')));
+  app.use(express.static(path.join(currentDir, '..', 'build')));
 
   app.get('/*', function (req, res) {
-    res.sendFile(path.join(__dirname, '..', 'build', 'index.html'));
+    res.sendFile(path.join(currentDir, '..', 'build', 'index.html'));
   });
 }
 

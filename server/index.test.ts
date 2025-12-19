@@ -29,17 +29,16 @@ describe('GET /api/forms/:formName', () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toHaveProperty('title', 'Event Registration');
-    expect(response.body).toHaveProperty('description');
     expect(response.body).toHaveProperty('pages');
     expect(Array.isArray(response.body.pages)).toBe(true);
-    expect(response.body.pages.length).toBe(2);
+    expect(response.body.pages.length).toBe(5);
   });
 
   it('should have pages with titles and fields', async () => {
     const response = await request(app).get('/api/forms/eventForm');
 
     const pages = response.body.pages;
-    expect(pages[0]).toHaveProperty('title', 'Basic Information');
+    expect(pages[0]).toHaveProperty('title', 'Event Basics');
     expect(pages[0]).toHaveProperty('fields');
     expect(Array.isArray(pages[0].fields)).toBe(true);
 
@@ -59,9 +58,10 @@ describe('GET /api/forms/:formName', () => {
     expect(fieldIds).toContain('hostContact');
     expect(fieldIds).toContain('eventDate');
     expect(fieldIds).toContain('eventTime');
+    expect(fieldIds).toContain('eventType');
     expect(fieldIds).toContain('partySize');
+    expect(fieldIds).toContain('spaceUse');
     expect(fieldIds).toContain('largePartyAgreement');
-    expect(fieldIds).toContain('specialRequests');
   });
 
   it('should have correct field types', async () => {

@@ -55,7 +55,7 @@
     "preview": "yarn build && yarn start",
     "test": "yarn test:client && yarn test:server",
     "test:client": "react-scripts test --watchAll=false",
-    "test:server": "jest --config server/jest.config.js",
+    "test:server": "vitest run --config server/vitest.config.ts",
     "test:watch": "react-scripts test",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\" \"server/**/*.ts\"",
     "lint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx}\" \"server/**/*.ts\" --fix",
@@ -82,7 +82,7 @@
     ]
   },
   "devDependencies": {
-    "@types/jest": "^30.0.0",
+    "@testing-library/dom": "^10.4.1",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node-cron": "^3.0.11",
     "@types/react-router-dom": "^5.3.3",
@@ -95,12 +95,11 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
-    "jest": "^30.2.0",
     "nodemon": "^3.1.11",
     "prettier": "^3.7.4",
     "supertest": "^7.1.4",
-    "ts-jest": "^29.4.6",
-    "tsx": "^4.21.0"
+    "tsx": "^4.21.0",
+    "vitest": "^2.0.0"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

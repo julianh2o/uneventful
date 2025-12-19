@@ -1,10 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const USERS_FILE = path.join(__dirname, '..', 'data', 'users.json');
+// tsx provides __dirname polyfill in ESM mode
+const currentDir = __dirname;
+const USERS_FILE = path.join(currentDir, '..', 'data', 'users.json');
 
 export interface StoredUser {
   id: string;

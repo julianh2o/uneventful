@@ -1,13 +1,13 @@
 import cron from 'node-cron';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import YAML from 'yaml';
 import { sendSms } from './sms';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const EVENTS_FILE = path.join(__dirname, '..', 'data', 'events.json');
-const TASKS_FILE = path.join(__dirname, '..', 'src', 'config', 'tasks.yaml');
+// tsx provides __dirname polyfill in ESM mode
+const currentDir = __dirname;
+const EVENTS_FILE = path.join(currentDir, '..', 'data', 'events.json');
+const TASKS_FILE = path.join(currentDir, '..', 'src', 'config', 'tasks.yaml');
 
 interface Event {
   id: string;

@@ -1,0 +1,5 @@
+# Admin users configuration
+# Phone numbers should be in E.164 format (e.g., +15551234567)
+
+admins:
+  - phone: "+15107615114"
