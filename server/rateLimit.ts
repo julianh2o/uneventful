@@ -55,3 +55,8 @@ setInterval(() => {
     }
   }
 }, 5 * 60 * 1000);
+
+// Export for testing purposes
+export const clearRateLimits = (): void => {
+  rateLimitStore.clear();
+};

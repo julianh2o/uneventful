@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 import { DynamicForm } from './DynamicForm';
 import { FormConfig } from '../../types/FormConfig';
@@ -133,34 +134,43 @@ describe('DynamicForm', () => {
     });
 
     it('renders conditional checkbox when condition is met', async () => {
+      const user = userEvent.setup();
       render(<DynamicForm config={mockConfig} />);
 
       // Open the select dropdown and choose '21-50'
       const select = screen.getByLabelText(/Party Size/i);
-      await userEvent.click(select);
+      await user.click(select);
 
       const option = await screen.findByRole('option', { name: '21-50 guests' });
-      await userEvent.click(option);
+      await user.click(option);
 
       // Now the checkbox should be visible
       expect(screen.getByLabelText(/I Agree/i)).toBeInTheDocument();
     });
 
     it('calls onSubmit with form values when submitted', async () => {
-      const handleSubmit = jest.fn();
+      const user = userEvent.setup();
+      const handleSubmit = vi.fn();
       render(<DynamicForm config={mockConfig} onSubmit={handleSubmit} />);
 
       // Fill in text fields
-      await userEvent.type(screen.getByLabelText(/Event Name/i), 'Birthday Party');
-      await userEvent.type(screen.getByLabelText(/Host Name/i), 'John Doe');
+      await user.type(screen.getByLabelText(/Event Name/i), 'Birthday Party');
+      await user.type(screen.getByLabelText(/Host Name/i), 'John Doe');
+
+      // Fill in required select field
+      const select = screen.getByLabelText(/Party Size/i);
+      await user.click(select);
+      const option = await screen.findByRole('option', { name: '1-10 guests' });
+      await user.click(option);
 
       // Submit the form
-      await userEvent.click(screen.getByRole('button', { name: /submit/i }));
+      await user.click(screen.getByRole('button', { name: /submit/i }));
 
       expect(handleSubmit).toHaveBeenCalledWith(
         expect.objectContaining({
           eventName: 'Birthday Party',
           hostName: 'John Doe',
+          partySize: '1-10',
         })
       );
     });
@@ -200,9 +210,14 @@ describe('DynamicForm', () => {
     });
 
     it('navigates to second page when Next is clicked', async () => {
+      const user = userEvent.setup();
       render(<DynamicForm config={mockMultiPageConfig} />);
 
-      await userEvent.click(screen.getByRole('button', { name: /next/i }));
+      // Fill in required fields on first page
+      await user.type(screen.getByLabelText(/Event Name/i), 'Test Event');
+      await user.type(screen.getByLabelText(/Host Name/i), 'Test Host');
+
+      await user.click(screen.getByRole('button', { name: /next/i }));
 
       // Second page fields should now be visible
       expect(screen.getByLabelText(/Event Date/i)).toBeInTheDocument();
@@ -212,9 +227,14 @@ describe('DynamicForm', () => {
     });
 
     it('shows Back and Submit buttons on last page', async () => {
+      const user = userEvent.setup();
       render(<DynamicForm config={mockMultiPageConfig} />);
 
-      await userEvent.click(screen.getByRole('button', { name: /next/i }));
+      // Fill in required fields on first page
+      await user.type(screen.getByLabelText(/Event Name/i), 'Test Event');
+      await user.type(screen.getByLabelText(/Host Name/i), 'Test Host');
+
+      await user.click(screen.getByRole('button', { name: /next/i }));
 
       expect(screen.getByRole('button', { name: /back/i })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /submit/i })).toBeInTheDocument();
@@ -222,65 +242,86 @@ describe('DynamicForm', () => {
     });
 
     it('navigates back to first page when Back is clicked', async () => {
+      const user = userEvent.setup();
       render(<DynamicForm config={mockMultiPageConfig} />);
 
+      // Fill in required fields on first page
+      await user.type(screen.getByLabelText(/Event Name/i), 'Test Event');
+      await user.type(screen.getByLabelText(/Host Name/i), 'Test Host');
+
       // Go to second page
-      await userEvent.click(screen.getByRole('button', { name: /next/i }));
+      await user.click(screen.getByRole('button', { name: /next/i }));
       expect(screen.getByLabelText(/Event Date/i)).toBeInTheDocument();
 
       // Go back to first page
-      await userEvent.click(screen.getByRole('button', { name: /back/i }));
+      await user.click(screen.getByRole('button', { name: /back/i }));
       expect(screen.getByLabelText(/Event Name/i)).toBeInTheDocument();
       expect(screen.queryByLabelText(/Event Date/i)).not.toBeInTheDocument();
     });
 
     it('preserves form values when navigating between pages', async () => {
+      const user = userEvent.setup();
       render(<DynamicForm config={mockMultiPageConfig} />);
 
-      // Fill in first page
-      await userEvent.type(screen.getByLabelText(/Event Name/i), 'Birthday Party');
+      // Fill in first page (both required fields)
+      await user.type(screen.getByLabelText(/Event Name/i), 'Birthday Party');
+      await user.type(screen.getByLabelText(/Host Name/i), 'Test Host');
 
       // Go to second page
-      await userEvent.click(screen.getByRole('button', { name: /next/i }));
+      await user.click(screen.getByRole('button', { name: /next/i }));
 
       // Go back to first page
-      await userEvent.click(screen.getByRole('button', { name: /back/i }));
+      await user.click(screen.getByRole('button', { name: /back/i }));
 
-      // Value should be preserved
+      // Values should be preserved
       expect(screen.getByLabelText(/Event Name/i)).toHaveValue('Birthday Party');
+      expect(screen.getByLabelText(/Host Name/i)).toHaveValue('Test Host');
     });
 
     it('calls onSubmit with all form values when submitted on last page', async () => {
-      const handleSubmit = jest.fn();
+      const user = userEvent.setup();
+      const handleSubmit = vi.fn();
       render(<DynamicForm config={mockMultiPageConfig} onSubmit={handleSubmit} />);
 
       // Fill in first page
-      await userEvent.type(screen.getByLabelText(/Event Name/i), 'Birthday Party');
-      await userEvent.type(screen.getByLabelText(/Host Name/i), 'John Doe');
+      await user.type(screen.getByLabelText(/Event Name/i), 'Birthday Party');
+      await user.type(screen.getByLabelText(/Host Name/i), 'John Doe');
 
       // Go to second page
-      await userEvent.click(screen.getByRole('button', { name: /next/i }));
+      await user.click(screen.getByRole('button', { name: /next/i }));
 
       // Fill in second page
-      await userEvent.type(screen.getByLabelText(/Event Date/i), '12/25/2024');
+      await user.type(screen.getByLabelText(/Event Date/i), '12/25/2024');
+
+      // Fill in required select field
+      const select = screen.getByLabelText(/Party Size/i);
+      await user.click(select);
+      const option = await screen.findByRole('option', { name: '1-10 guests' });
+      await user.click(option);
 
       // Submit
-      await userEvent.click(screen.getByRole('button', { name: /submit/i }));
+      await user.click(screen.getByRole('button', { name: /submit/i }));
 
       expect(handleSubmit).toHaveBeenCalledWith(
         expect.objectContaining({
           eventName: 'Birthday Party',
           hostName: 'John Doe',
           eventDate: '12/25/2024',
+          partySize: '1-10',
         })
       );
     });
 
     it('renders page description', async () => {
+      const user = userEvent.setup();
       render(<DynamicForm config={mockMultiPageConfig} />);
       expect(screen.getByText('Tell us about your event.')).toBeInTheDocument();
 
-      await userEvent.click(screen.getByRole('button', { name: /next/i }));
+      // Fill in required fields on first page
+      await user.type(screen.getByLabelText(/Event Name/i), 'Test Event');
+      await user.type(screen.getByLabelText(/Host Name/i), 'Test Host');
+
+      await user.click(screen.getByRole('button', { name: /next/i }));
       expect(screen.getByText('Provide event details.')).toBeInTheDocument();
     });
   });
