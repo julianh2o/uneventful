@@ -14,6 +14,38 @@ interface EventRegistrationProps {
   editMode?: boolean;
 }
 
+const formatDateForStorage = (isoDate: string): string => {
+  // Convert YYYY-MM-DD to MM/DD/YYYY
+  const [year, month, day] = isoDate.split('-');
+  return `${month}/${day}/${year}`;
+};
+
+const formatDateForInput = (usDate: string): string => {
+  // Convert MM/DD/YYYY to YYYY-MM-DD
+  const [month, day, year] = usDate.split('/');
+  return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+};
+
+const formatTimeForStorage = (time24: string): string => {
+  // Convert HH:MM (24-hour) to h:MM AM/PM (12-hour)
+  const [hours24, minutes] = time24.split(':').map(Number);
+  const period = hours24 >= 12 ? 'PM' : 'AM';
+  const hours12 = hours24 % 12 || 12; // Convert 0 to 12 for midnight
+  return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`;
+};
+
+const formatTimeForInput = (time12: string): string => {
+  // Convert h:MM AM/PM to HH:MM (24-hour)
+  const match = time12.match(/(\d+):(\d+)\s*(AM|PM)/i);
+  if (!match) return time12;
+  let hours = parseInt(match[1], 10);
+  const minutes = match[2];
+  const period = match[3].toUpperCase();
+  if (period === 'PM' && hours !== 12) hours += 12;
+  if (period === 'AM' && hours === 12) hours = 0;
+  return `${hours.toString().padStart(2, '0')}:${minutes}`;
+};
+
 export const EventRegistration = ({ editMode = false }: EventRegistrationProps) => {
   const history = useHistory();
   const { id } = useParams<{ id?: string }>();
@@ -22,38 +54,6 @@ export const EventRegistration = ({ editMode = false }: EventRegistrationProps) 
   const [initialValues, setInitialValues] = useState<Record<string, string | boolean> | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const formatDateForStorage = (isoDate: string): string => {
-    // Convert YYYY-MM-DD to MM/DD/YYYY
-    const [year, month, day] = isoDate.split('-');
-    return `${month}/${day}/${year}`;
-  };
-
-  const formatDateForInput = (usDate: string): string => {
-    // Convert MM/DD/YYYY to YYYY-MM-DD
-    const [month, day, year] = usDate.split('/');
-    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-  };
-
-  const formatTimeForStorage = (time24: string): string => {
-    // Convert HH:MM (24-hour) to h:MM AM/PM (12-hour)
-    const [hours24, minutes] = time24.split(':').map(Number);
-    const period = hours24 >= 12 ? 'PM' : 'AM';
-    const hours12 = hours24 % 12 || 12; // Convert 0 to 12 for midnight
-    return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`;
-  };
-
-  const formatTimeForInput = (time12: string): string => {
-    // Convert h:MM AM/PM to HH:MM (24-hour)
-    const match = time12.match(/(\d+):(\d+)\s*(AM|PM)/i);
-    if (!match) return time12;
-    let hours = parseInt(match[1], 10);
-    const minutes = match[2];
-    const period = match[3].toUpperCase();
-    if (period === 'PM' && hours !== 12) hours += 12;
-    if (period === 'AM' && hours === 12) hours = 0;
-    return `${hours.toString().padStart(2, '0')}:${minutes}`;
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -106,7 +106,7 @@ export const EventRegistration = ({ editMode = false }: EventRegistrationProps) 
     };
 
     fetchData();
-  }, [editMode, id, user, formatDateForInput, formatTimeForInput]);
+  }, [editMode, id, user]);
 
   const handleSubmit = async (values: Record<string, string | boolean>) => {
     try {
