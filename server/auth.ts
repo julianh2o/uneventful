@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 const MAGIC_LINK_EXPIRY = '15m';
 const SESSION_EXPIRY = '30d';
-const APP_BASE_URL = process.env.APP_BASE_URL || 'http://localhost:2999';
+const APP_BASE_URL = process.env.APP_BASE_URL || 'http://localhost:2998';
 
 export interface MagicLinkToken {
   userId: string;

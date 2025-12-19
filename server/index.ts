@@ -3,8 +3,11 @@ import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { v4 as uuidv4 } from 'uuid';
 import YAML from 'yaml';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import { startReminderJob } from './reminderJob';
 import {
   generateMagicLinkToken,
@@ -55,7 +58,7 @@ const writeEvents = (events: Event[]): void => {
 };
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 2999;
 
 app.use(cors());
 app.use(express.json());
@@ -427,15 +430,15 @@ app.post('/api/errors', (req, res) => {
 // Catch-all route to serve React app for client-side routing
 // This must be after all API routes
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(__dirname, 'build')));
+  app.use(express.static(path.join(__dirname, '..', 'build')));
 
   app.get('/*', function (req, res) {
-    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+    res.sendFile(path.join(__dirname, '..', 'build', 'index.html'));
   });
 }
 
-// Only start the server if this file is run directly
-if (require.main === module) {
+// Start the server
+if (process.argv[1]?.includes('server/index')) {
   app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);
     startReminderJob();

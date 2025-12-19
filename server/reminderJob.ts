@@ -1,9 +1,11 @@
 import cron from 'node-cron';
 import fs from 'fs';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import YAML from 'yaml';
 import { sendSms } from './sms';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const EVENTS_FILE = path.join(__dirname, '..', 'data', 'events.json');
 const TASKS_FILE = path.join(__dirname, '..', 'src', 'config', 'tasks.yaml');
 

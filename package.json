@@ -40,7 +40,6 @@
     "react-markdown": "^10.1.0",
     "react-router-dom": "^7.11.0",
     "react-scripts": "^5.0.1",
-    "ts-node": "^10.9.2",
     "twilio": "^5.11.1",
     "typescript": "^5.9.3",
     "uuid": "^13.0.0",
@@ -48,15 +47,21 @@
     "yaml": "^2.8.2"
   },
   "scripts": {
-    "start": "NODE_ENV=production PORT=2999 react-scripts start",
+    "dev": "concurrently -n client,server -c blue,green \"yarn dev:client\" \"yarn dev:server\"",
+    "dev:client": "PORT=2998 react-scripts start",
+    "dev:server": "NODE_ENV=development nodemon --watch server --ext ts --exec 'tsx server/index.ts'",
     "build": "react-scripts build",
-    "test": "react-scripts test",
-    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
-    "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --quiet",
-    "server": "ts-node --project server/tsconfig.json server/index.ts",
-    "server:dev": "NODE_ENV=development nodemon --watch server --ext ts --exec 'ts-node --project server/tsconfig.json server/index.ts'",
-    "server:prod-local": "NODE_ENV=production PORT=3001 ts-node --project server/tsconfig.json server/index.ts",
-    "test:server": "jest --config server/jest.config.js"
+    "start": "NODE_ENV=production tsx server/index.ts",
+    "preview": "yarn build && yarn start",
+    "test": "yarn test:client && yarn test:server",
+    "test:client": "react-scripts test --watchAll=false",
+    "test:server": "jest --config server/jest.config.js",
+    "test:watch": "react-scripts test",
+    "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\" \"server/**/*.ts\"",
+    "lint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx}\" \"server/**/*.ts\" --fix",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\" \"server/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx}\" \"server/**/*.ts\"",
+    "typecheck": "tsc --noEmit && tsc --noEmit --project server/tsconfig.json"
   },
   "eslintConfig": {
     "extends": [
@@ -82,8 +87,8 @@
     "@types/node-cron": "^3.0.11",
     "@types/react-router-dom": "^5.3.3",
     "@types/supertest": "^6.0.3",
-    "@types/uuid": "^11.0.0",
     "@typescript-eslint/parser": "^8.50.0",
+    "concurrently": "^9.2.1",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
@@ -94,6 +99,8 @@
     "nodemon": "^3.1.11",
     "prettier": "^3.7.4",
     "supertest": "^7.1.4",
-    "ts-jest": "^29.4.6"
-  }
+    "ts-jest": "^29.4.6",
+    "tsx": "^4.21.0"
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

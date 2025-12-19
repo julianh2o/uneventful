@@ -1,4 +1,4 @@
-const API_PORT = 3001;
+const API_PORT = 2999;
 
 export const getApiBaseUrl = (): string => {
   // In production, use the same origin as the frontend (no port, same protocol)

@@ -10,7 +10,7 @@ uneventful is an event management application built on a React/TypeScript fronte
 
 ### Development
 ```bash
-# Frontend (React on port 2999)
+# Frontend (React on port 2998)
 yarn start
 
 # Backend server (development mode with hot reload)
@@ -45,9 +45,9 @@ yarn format
 The application has distinct development and production configurations:
 
 **Development:**
-- Frontend: `http://localhost:2999`
-- Backend API: `http://localhost:3001`
-- API calls use explicit port 3001
+- Frontend: `http://localhost:2998`
+- Backend API: `http://localhost:2999`
+- API calls use explicit port 2999
 
 **Production:**
 - Frontend and backend served from same origin (e.g., `https://uneventful.bawdyshop.space`)
@@ -195,7 +195,7 @@ Backend uses `.env` file with:
 - `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`
 - `JWT_SECRET`
 - `APP_BASE_URL` (for magic link URLs)
-- `PORT` (defaults to 3001)
+- `PORT` (defaults to 2999)
 
 ## Deployment Notes
 
@@ -203,5 +203,5 @@ Production deployment requires:
 1. Build frontend: `yarn build`
 2. Start server: `yarn server` (serves both API and static build)
 3. Ensure `.env` configured with production values
-4. Server listens on PORT from env or 3001
+4. Server listens on PORT from env or 2999
 5. Frontend automatically detects production environment and uses same-origin API calls
