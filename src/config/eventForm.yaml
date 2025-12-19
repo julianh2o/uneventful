@@ -1,7 +1,7 @@
 title: Event Registration
 
 pages:
-  - title: Event Information
+  - title: Event Basics
     description: |
       So you'd like to host an event at the Bawdy Shop? Great! We'd love to have your event here. This questionnaire lets us get a sense for the shape of your event so that we can set our expectations appropriately, communicate effectively, and facilitate accordingly!
     fields:
@@ -25,11 +25,12 @@ pages:
         required: true
         disabled: true
 
-      - id: eventDescription
+      - id: cohosts
         type: textarea
-        label: Event Description
-        placeholder: Describe your event...
-        required: true
+        label: Co-hosts & Contact Information
+        placeholder: 'List any co-host names and their contact information (email or phone). You can provide multiple co-hosts, one per line.'
+        description: 'If you have co-hosts for this event, please enter their names and contact info here. You may provide more than one co-host, each on its own line.'
+        required: false
 
       - id: eventDate
         type: date
@@ -39,6 +40,36 @@ pages:
       - id: eventTime
         type: time
         label: Event Time
+        required: true
+
+  - title: Event Details
+    description: |
+      Tell us about the type of event you're hosting.
+    fields:
+      - id: eventType
+        type: select
+        label: Event Type
+        required: true
+        options:
+          - value: 'party'
+            label: 'Party'
+          - value: 'activity'
+            label: 'Activity focused'
+          - value: 'workshop'
+            label: 'Workshop'
+          - value: 'arts_crafts'
+            label: 'Arts / Crafts'
+          - value: 'coworking'
+            label: 'Parallel Play / Coworking'
+          - value: 'performance'
+            label: 'Performance'
+          - value: 'other'
+            label: 'Other'
+
+      - id: eventDescription
+        type: textarea
+        label: Event Description
+        placeholder: Describe your event...
         required: true
 
       - id: partySize
@@ -57,36 +88,6 @@ pages:
           - value: '100+'
             label: 'More than 100 guests'
 
-  - title: Invitation Policy
-    description: |
-      The Bawdy Shop has a few different levels of engagement. By default any event placed on the calendar is open to all members of the **Bawdy Besties**, a group of about 15 people who have increased stewardship of the space.
-
-      In addition, the **Bawdy Buddies** represents a larger group of people who have been to the Bawdy Shop for a previous event and expressed interest in future large events. If you are trying to increase your reach, consider inviting the Bawdy Buddies.
-
-      Otherwise inviting the Bawdy Besties can provide internal appreciation and facilitation resources. **Private events** are also welcome, though in most cases, there will be at least one facilitator from the Bawdy Besties on site as a resource.
-    fields:
-      - id: invitationLevel
-        type: select
-        label: Who would you like to invite?
-        required: true
-        options:
-          - value: 'private'
-            label: 'Private (I will pick and choose all invitees)'
-          - value: 'besties'
-            label: 'Open to Bawdy Besties'
-          - value: 'buddies'
-            label: 'Blast to all Bawdy Buddies'
-
-      - id: plusOnePolicy
-        type: text
-        label: '+1 Policy'
-        placeholder: Describe your +1 policy...
-        required: true
-        helperText: Describe in detail the +1 policy. Number permitted, communication requirements, RSVP tracking, etc.
-
-  - title: Space Use
-    description: Select which areas of the Bawdy Shop you plan to use for your event.
-    fields:
       - id: spaceUse
         type: checkboxGroup
         label: Which spaces will your event use?
@@ -117,21 +118,56 @@ pages:
           - value: 'red-room'
             label: 'Red Room'
 
+  - title: Invitation Policy
+    description: |
+      The Bawdy Shop has a few different levels of engagement. By default any event placed on the calendar is open to all members of the **Bawdy Besties**, a group of about 15 people who have increased stewardship of the space.
+
+      In addition, the **Bawdy Buddies** represents a larger group of people who have been to the Bawdy Shop for a previous event and expressed interest in future large events. If you are trying to increase your reach, consider inviting the Bawdy Buddies.
+
+      Otherwise inviting the Bawdy Besties can provide internal appreciation and facilitation resources. **Private events** are also welcome, though in most cases, there will be at least one facilitator from the Bawdy Besties on site as a resource.
+    fields:
+      - id: invitationLevel
+        type: select
+        label: Who would you like to invite?
+        required: true
+        options:
+          - value: 'private'
+            label: 'Private (I will pick and choose all invitees)'
+          - value: 'besties'
+            label: 'Open to Bawdy Besties'
+          - value: 'buddies'
+            label: 'Blast to all Bawdy Buddies'
+
+      - id: plusOnePolicy
+        type: text
+        label: '+1 Policy'
+        placeholder: Describe your +1 policy...
+        required: true
+        helperText: Describe in detail the +1 policy. Number permitted, communication requirements, RSVP tracking, etc.
+
   - title: Use Considerations
     description: Based on your selections, please review and agree to the following considerations.
     fields:
       - id: kitchenAgreement
         title: Kitchen
         type: checkbox
-        label: Kitchen Use Agreement
         description: |
-          By using the kitchen, you agree to the following:
+          When using the Bawdy Shop kitchen, please be sure to take some extra time at the end of the party to ensure that the kitchen is clean and tidy. In order for a space like the Bawdy Shop to function well and be available for everyone, we aspire to leaving spaces even better than when we found them.
 
-          - **Clean as you go** - All dishes, utensils, and surfaces must be cleaned immediately after use
-          - **No dishes left overnight** - Everything must be washed, dried, and put away before leaving
-          - **Shared space respect** - The kitchen is shared; leave it cleaner than you found it
-          - **Appliance care** - Report any issues with appliances immediately to a Bawdy Bestie
-          - **Food labeling** - Any food left in the fridge must be clearly labeled with your name and event date
+          An incomplete list of cleanup expectations follows:
+
+          - Dishes/cups collected from Red Room, office, living room, outside, and other surfaces.
+          - Cooking dishes well scrubbed/washed and dried
+          - Sink is clear of dishes
+          - Drying rack is clear of dry dishes (note: it's okay to leave damp dishes, but please be mindful of future washed dishes needing a space to go)
+          - Kitchen table(s) are cleared and wiped down
+          - Sink Strainer emptied and cleaned
+          - Compost taken out to bins
+          - Trash taken out to bins
+          - Recycling taken out to bins
+          - Refrigerator cleared of all perishable items that were introduced during the party
+
+          Note: Even if your use of the kitchen is minor and low impact, please be sure to leave it in a better state than you found it
         checkboxLabel: I Agree to the Kitchen Use Terms
         required: true
         condition:
@@ -145,17 +181,23 @@ pages:
       - id: hotTubAgreement
         title: Hot Tub
         type: checkbox
-        label: Hot Tub Use Agreement
         description: |
-          By using the hot tub, you agree to the following:
+          The Hot Tub takes some additional maintenance to ensure that it is clean and safe for everyone to use.
 
-          - **Shower before entering** - All guests must rinse off before getting in the hot tub
-          - **No glass** - Absolutely no glass containers near or in the hot tub area
-          - **Capacity limit** - Maximum 8 people in the hot tub at once
-          - **Supervision** - A sober person must be designated to monitor hot tub use
-          - **Cover replacement** - The hot tub cover must be replaced when not in active use
-          - **No food or drinks in the water** - Keep all consumables on the deck
-          - **Report issues** - Notify a Bawdy Bestie immediately if water appears cloudy or equipment malfunctions
+          **To open the hot tub:**
+
+          - Peel the cover off starting at the left side near the pump unit. The cover can simply be left on the side of the hot tub.
+          - Once the cover is peeled off, remove the inflatable cover and set it aside.
+
+          **Remember:** No glass in the hot tub or surrounding areas.
+
+          **At the conclusion of the event, follow these steps:**
+
+          1. Find the tub of chlorine against the side of the house BETWEEN the two doors that go into the main house (under the pergola) and push the latch on the side and rotate to open it.
+          2. Use the small plastic container on top of the chlorine to measure out approximately 1/3 of a container of granulated chlorine and sprinkle it into the hot tub.
+          3. Use the hose by that side of the house to fill the hot tub until the water level is between the two lines on the side (below Max Fill).
+          4. Use the pool net to skim off any debris that may have fallen into the tub.
+          5. Cover the hot tub using the reverse process from above.
         checkboxLabel: I Agree to the Hot Tub Use Terms
         required: true
         condition:
@@ -166,16 +208,14 @@ pages:
       - id: largePartyAgreement
         title: Large Party
         type: checkbox
-        label: Large Party Agreement
         description: |
-          For parties over 20 guests, you acknowledge and agree to the following:
+          If you are expecting more than 20 people, there's likely to be a bit more chaos and thus clean up involved. In this case, there are some additional required expectations to ensure that the event goes smoothly and that the space is appropriately reset.
 
-          - **Additional fees** may apply for parties over 20 guests
-          - A **dedicated coordinator** from the Bawdy Besties will be assigned to your event
-          - **48-hour cancellation notice** is required for large parties
-          - **Guest list** - You must provide a guest list 24 hours before the event
-          - **Parking coordination** - Large events require a parking plan to avoid neighborhood disruption
-          - **Noise management** - Music must be kept at reasonable levels, especially after 10 PM
+          - At least one co-host is required who is responsible for reading this document and upholding its standards
+          - Designated clean up time and volunteers for it (approximately 1 cleanup volunteer per 15 attendees)
+          - A poster with an appropriate Bawdy Shop "Event Intentions" key
+          - Direct / detailed communication with a Bawdy Backbone member containing information about the plan, vibe, organization, etc. of the event
+          - Scheduling a post-party reset during the week following is REQUIRED in which at least the host and all cohosts are present to go through the final checklist to reset the space (final cleanup cannot be planned for the day after the party)
         checkboxLabel: I Agree to the Large Party Terms
         required: true
         condition:
@@ -185,3 +225,68 @@ pages:
             - '21-50'
             - '51-100'
             - '100+'
+
+      - id: eventPoster
+        title: Event Posters
+        type: checkboxGroup
+        description: |
+          Event posters provide an easy way of sharing details about an upcoming event. They're especially useful for sharing an event on Instagram for a larger audience, and they're a fun graphical piece that will become a lasting part of Bawdy Shop history. That said, these posters are OPTIONAL unless your event is bigger than 20 people.
+
+          **Some notes:**
+
+          - The best way to make these is with the [Event Posters Canva document](https://www.canva.com/design/DAG1y0CJNlY/Q4hFLOYJqT7MUxlykBbfvQ/edit)—just copy an existing page, or start one from scratch.
+          - For large events (more than 20 people), using the Bawdy Shop "Event Intentions" key on the poster is required; for smaller events, it is strongly recommended.
+          - Using your own method or tool to create posters is fine, but it is strongly recommended to use a size of 1080 x 1350 for consistency and Instagram-friendliness.
+          - For large parties, do *not* include the address of the Bawdy Shop or individual phone numbers on the poster. People can get in touch via Instagram.
+        checkboxLabel: Did you (or will you) make an event poster?
+        required: true
+        options:
+          - value: 'no'
+            label: "Nah, it's small"
+          - value: 'yes'
+            label: "Yes, I'll have a poster"
+
+
+  - title: General Expectations
+    description: Based on your selections, please review and agree to the following considerations.
+    fields:
+    - id: generalExpectationsAgreement
+      title: "I Agree"
+      type: checkbox
+      description: |
+        The Bawdy Shop is a community owned/operated space, this means that each and every person who occupies or uses the space is expected to share some responsibility for keeping the space healthy, clean, maintained, and functional.
+
+        As an event host, it is important to both take on that responsibility personally and to model/communicate this responsibility to guests, cohosts, and volunteers.
+
+        Keep in mind these general expectations and take steps to intentionally incorporate them into your event planning, communication, etc.
+
+        As long as there are guests on the property, there is at least one designated "host" who has been knowingly tasked with closing the space when the last person leaves. Hosts may delegate this to individuals who are very familiar with the space.
+
+        Events are expected to leave the space better than they found it. Incorporate into your planning some extra time to ensure that there is time to perform extra maintenance that may not be part of your basic party responsibilities.
+
+        Don't forget, as events grow in size, ambition, and inebriation the amount of labor required to maintain these expectations increases dramatically. Be honest with yourself and your own bandwidth and make sure that you're including reliable volunteers to help share the responsibility, continued hosting privileges depend on this!
+      checkboxLabel: I Agree to the General Expectations
+      required: true
+
+    - id: gcalEvent
+      title: Google Calendar Event
+      type: checkboxGroup
+      description: |
+          **All events must be on the Bawdy Shop Google Calendar.**
+
+          If you do not have access to this calendar, you must coordinate with someone who does to ensure your event appears there.
+
+          - To check if you have access, [click here](https://calendar.google.com/calendar/u/0/r?cid=OTAxYTEyNzYyMjhmYjY2MjYxYmZkN2RkMjcxODNlNDE2NjQ3MzZlODNiOWJhNWJhZGU0ZmZmZmZlNzdiZDJiZEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t) while logged into Google.
+          - Make sure the calendar event's description clearly lists the invitation policy, hosts, and expectations.
+          - If coordinating with someone else, ask them to create the event. If you need help, you may contact: julianh2o@gmail.com.
+          - If you create an Event Poster, you are encouraged to upload it to the Event Posters folder in Google Drive and link to it in the calendar event.
+          - Depending on the event audience, consider adding `bawdybuddies@googlegroups.com` as a guest to email-blast the list and provide an RSVP avenue.
+      checkboxLabel: Has a Google Calendar event been created for this event?
+      required: true
+      options:
+        - value: 'yes'
+          label: "Yes, I have created the event"
+        - value: 'delegate-confirmed'
+          label: "No, but I've asked someone and they have confirmed creation"
+        - value: 'delegate-pending'
+          label: "No, but I've reached out to someone and I'm waiting to hear back"

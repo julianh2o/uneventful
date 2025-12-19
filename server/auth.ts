@@ -77,7 +77,7 @@ export const generateMagicLinkUrl = (token: string): string => {
 
 export const formatMagicLinkSms = (name: string | null, magicLinkUrl: string): string => {
   const greeting = name ? `Hi ${name}!` : 'Hi!';
-  return `${greeting} Click here to sign in to EVENTually: ${magicLinkUrl}
+  return `${greeting} Click here to sign in to uneventful: ${magicLinkUrl}
 
 This link expires in 15 minutes.`;
 };

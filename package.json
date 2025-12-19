@@ -1,7 +1,7 @@
 {
-  "name": "eventually",
+  "name": "uneventful",
   "version": "2.0.0",
-  "description": "EVENTually - Your event management solution",
+  "description": "uneventful - Your event management solution",
   "author": {
     "name": "Dan Castro",
     "url": "https://www.welcomedeveloper.com"
@@ -47,13 +47,13 @@
     "yaml": "^2.8.2"
   },
   "scripts": {
-    "start": "PORT=2999 react-scripts start",
+    "start": "NODE_ENV=production PORT=2999 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --quiet",
     "server": "ts-node --project server/tsconfig.json server/index.ts",
-    "server:dev": "nodemon --watch server --ext ts --exec 'ts-node --project server/tsconfig.json server/index.ts'",
+    "server:dev": "NODE_ENV=development nodemon --watch server --ext ts --exec 'ts-node --project server/tsconfig.json server/index.ts'",
     "test:server": "jest --config server/jest.config.js"
   },
   "eslintConfig": {

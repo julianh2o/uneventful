@@ -1,6 +1,6 @@
 import { getApiBaseUrl } from '../utils/api';
 
-const TOKEN_KEY = 'eventually_session_token';
+const TOKEN_KEY = 'uneventful_session_token';
 
 export interface AuthUser {
   id: string;

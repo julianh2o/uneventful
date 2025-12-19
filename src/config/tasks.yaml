@@ -38,3 +38,23 @@ tasks:
       - Return furniture to original positions
       - Dispose of waste and recycling
       - Final walkthrough inspection
+
+  - id: take-inventory
+    name: Take Inventory
+    description: |
+      Hosts are expected to perform basic inventory during the process of setup or cleanup of an event. This is essential to making sure the Bawdy Shop stays functional for future events.
+
+      While explicitly checking each item at the completion of a party is not required, get in the habit of making mental notes when passing through these areas and explicitly check the bigger ones that are being used by your event (e.g., toilet paper).
+
+      Any items running low, depleted, damaged, or of note should be reported in the appropriate channel or to your coordination contact.
+    deadline: -1
+    subtasks:
+      - Check toilet paper and paper towels
+      - Note kegs/canned drinks and NA beverages inventory
+      - Check dish soap and cleaning supplies
+      - Check condoms and safer sex supplies
+      - Check first aid supplies (especially Lactaid and anti-nausea)
+      - Note spices and food staples (rice, coffee)
+      - Check frozen meals and snacks
+      - Document any lost and found items
+      - Report any damage or broken furniture/items

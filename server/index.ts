@@ -424,9 +424,11 @@ app.post('/api/errors', (req, res) => {
 
 // Catch-all route to serve React app for client-side routing
 // This must be after all API routes
-app.get(/^\/(?!api).*/, (req, res) => {
-  res.sendFile(path.join(__dirname, '..', 'build', 'index.html'));
-});
+if (process.env.NODE_ENV === 'production') {
+  app.get(/^\/(?!api).*/, (req, res) => {
+    res.sendFile(path.join(__dirname, '..', 'build', 'index.html'));
+  });
+}
 
 // Only start the server if this file is run directly
 if (require.main === module) {

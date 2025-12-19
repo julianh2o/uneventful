@@ -135,7 +135,7 @@ export const checkAndSendReminders = async (): Promise<void> => {
     }
 
     const taskNames = dueTasks.map(t => t.name).join(', ');
-    const message = `Hi ${hostName}! Reminder: The following tasks for "${eventName}" are due today: ${taskNames}. - EVENTually`;
+    const message = `Hi ${hostName}! Reminder: The following tasks for "${eventName}" are due today: ${taskNames}. - uneventful`;
 
     console.log(`Sending reminder to ${phoneNumber} for tasks: ${taskNames}`);
     const result = await sendSms({ to: phoneNumber, message });

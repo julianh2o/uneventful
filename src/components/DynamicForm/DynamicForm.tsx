@@ -6,6 +6,8 @@ import {
   FormControl,
   FormControlLabel,
   Checkbox,
+  Radio,
+  RadioGroup,
   InputLabel,
   Select,
   MenuItem,
@@ -22,7 +24,7 @@ import {
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 
-import { FormConfig, FormField, FormFieldCondition, FormPage } from '../../types/FormConfig';
+import { FormConfig, FormField, FormFieldCondition, FormFieldOption, FormPage } from '../../types/FormConfig';
 
 interface DynamicFormProps {
   config: FormConfig;
@@ -62,6 +64,22 @@ export const DynamicForm = ({ config, initialValues, onSubmit }: DynamicFormProp
 
   const handleChange = useCallback((fieldId: string, value: string | boolean) => {
     setValues((prev) => ({ ...prev, [fieldId]: value }));
+  }, []);
+
+  // Normalize options from either array or dictionary format
+  const normalizeOptions = useCallback((options?: FormFieldOption[] | Record<string, string>): FormFieldOption[] => {
+    if (!options) return [];
+
+    // If it's already an array, return it
+    if (Array.isArray(options)) {
+      return options;
+    }
+
+    // Convert dictionary format to array format
+    return Object.entries(options).map(([value, label]) => ({
+      value,
+      label,
+    }));
   }, []);
 
   const evaluateCondition = useCallback(
@@ -201,7 +219,7 @@ export const DynamicForm = ({ config, initialValues, onSubmit }: DynamicFormProp
               label={field.label}
               onChange={(e) => handleChange(field.id, e.target.value)}
             >
-              {field.options?.map((option) => (
+              {normalizeOptions(field.options).map((option) => (
                 <MenuItem key={option.value} value={option.value}>
                   {option.label}
                 </MenuItem>
@@ -213,6 +231,11 @@ export const DynamicForm = ({ config, initialValues, onSubmit }: DynamicFormProp
       case 'checkbox':
         return (
           <Box key={field.id} sx={{ my: 2 }}>
+            {field.title && (
+              <Typography variant="h6" sx={{ mb: 1 }}>
+                {field.title}
+              </Typography>
+            )}
             {field.description && (
               <Paper
                 variant="outlined"
@@ -281,7 +304,7 @@ export const DynamicForm = ({ config, initialValues, onSubmit }: DynamicFormProp
               </Box>
             )}
             <FormGroup>
-              {field.options?.map((option) => (
+              {normalizeOptions(field.options).map((option) => (
                 <FormControlLabel
                   key={option.value}
                   control={
@@ -298,6 +321,39 @@ export const DynamicForm = ({ config, initialValues, onSubmit }: DynamicFormProp
           </FormControl>
         );
       }
+
+      case 'radio':
+        return (
+          <FormControl key={field.id} component="fieldset" sx={{ my: 2, display: 'block' }}>
+            <FormLabel component="legend">{field.label}</FormLabel>
+            {field.description && (
+              <Box
+                sx={{ mb: 1 }}
+                css={css`
+                  & p {
+                    margin: 0.5em 0;
+                  }
+                `}
+              >
+                <ReactMarkdown>{field.description}</ReactMarkdown>
+              </Box>
+            )}
+            <RadioGroup
+              value={(values[field.id] as string) || ''}
+              onChange={(e) => handleChange(field.id, e.target.value)}
+            >
+              {normalizeOptions(field.options).map((option) => (
+                <FormControlLabel
+                  key={option.value}
+                  value={option.value}
+                  control={<Radio required={field.required} />}
+                  label={option.label}
+                />
+              ))}
+            </RadioGroup>
+            {field.helperText && <FormHelperText>{field.helperText}</FormHelperText>}
+          </FormControl>
+        );
 
       default:
         return null;
@@ -362,7 +418,7 @@ export const DynamicForm = ({ config, initialValues, onSubmit }: DynamicFormProp
         </>
       )}
 
-      {activePage.fields.map(renderField)}
+      {activePage.fields?.map(renderField)}
 
       <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
         {isMultiPage && !isFirstPage && (

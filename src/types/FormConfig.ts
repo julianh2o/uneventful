@@ -12,14 +12,15 @@ export interface FormFieldCondition {
 
 export interface FormField {
   id: string;
-  type: 'text' | 'textarea' | 'date' | 'time' | 'select' | 'checkbox' | 'checkboxGroup';
+  type: 'text' | 'textarea' | 'date' | 'time' | 'select' | 'checkbox' | 'checkboxGroup' | 'radio';
   label: string;
+  title?: string;
   placeholder?: string;
   required?: boolean;
   helperText?: string;
   description?: string;
   checkboxLabel?: string;
-  options?: FormFieldOption[];
+  options?: FormFieldOption[] | Record<string, string>; // Array or dictionary format
   condition?: FormFieldCondition;
   disabled?: boolean;
 }
