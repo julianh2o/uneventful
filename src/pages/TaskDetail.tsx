@@ -25,7 +25,7 @@ import {
 } from '@mui/icons-material';
 
 import { APP_TITLE } from '../utils/constants';
-import { getApiBaseUrl } from '../utils/api';
+import { apiClient } from '../utils/apiClient';
 import { reportError } from '../utils/errorReporter';
 
 interface EventData {
@@ -82,8 +82,8 @@ export const TaskDetail = () => {
     const fetchData = async () => {
       try {
         const [eventRes, tasksRes] = await Promise.all([
-          fetch(`${getApiBaseUrl()}/api/events/${eventId}`),
-          fetch(`${getApiBaseUrl()}/api/tasks`),
+          apiClient(`/api/events/${eventId}`),
+          apiClient('/api/tasks', { authenticated: false }),
         ]);
 
         if (!eventRes.ok) {
@@ -129,7 +129,7 @@ export const TaskDetail = () => {
     setCompletedTasks(next);
 
     try {
-      await fetch(`${getApiBaseUrl()}/api/events/${eventId}/tasks`, {
+      await apiClient(`/api/events/${eventId}/tasks`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ completedTasks: Array.from(next) }),

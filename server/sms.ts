@@ -36,7 +36,7 @@ export const sendSms = async ({ to, message }: SendSmsParams): Promise<SmsResult
     return { success: true, messageId: result.sid };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('Failed to send SMS:', errorMessage);
+    console.error('Failed to send SMS:', errorMessage, error);
     return { success: false, error: errorMessage };
   }
 };

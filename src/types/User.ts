@@ -25,26 +25,26 @@ export type User = {
 	name: string;
 
 	/**
+	 * The user's phone number (E.164 format)
+	 * @type {string}
+	 * @memberof User
+	 * @property phone
+	 * @required
+	 * @example
+	 * "+15551234567"
+	 */
+	phone: string;
+
+	/**
 	 * The user's email address
 	 * @type {string}
 	 * @memberof User
 	 * @property email
-	 * @required
+	 * @optional
 	 * @example
 	 * "john.smith@welcomedeveloper.com"
 	 */
-	email: string;
-
-	/**
-	 * The user's password
-	 * @type {string}
-	 * @memberof User
-	 * @property password
-	 * @optional
-	 * @example
-	 * "password"
-	 */
-	password?: string;
+	email?: string;
 
 	/**
 	 * The user's created date

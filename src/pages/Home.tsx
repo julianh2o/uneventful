@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 
 import { APP_TITLE, PAGE_TITLE_HOME } from '../utils/constants';
-import { getApiBaseUrl } from '../utils/api';
+import { apiClient } from '../utils/apiClient';
 
 interface Event {
   id: string;
@@ -33,7 +33,7 @@ export const Home = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await fetch(`${getApiBaseUrl()}/api/events`);
+        const response = await apiClient('/api/events');
         if (!response.ok) {
           throw new Error('Failed to load events');
         }

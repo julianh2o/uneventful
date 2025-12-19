@@ -7,7 +7,7 @@ import { DynamicForm } from '../components/DynamicForm';
 import { FormConfig } from '../types/FormConfig';
 import { APP_TITLE } from '../utils/constants';
 import { reportError } from '../utils/errorReporter';
-import { getApiBaseUrl } from '../utils/api';
+import { apiClient } from '../utils/apiClient';
 
 interface EventRegistrationProps {
   editMode?: boolean;
@@ -25,7 +25,7 @@ export const EventRegistration = ({ editMode = false }: EventRegistrationProps) 
     const fetchData = async () => {
       try {
         // Fetch form config
-        const configResponse = await fetch(`${getApiBaseUrl()}/api/forms/eventForm`);
+        const configResponse = await apiClient('/api/forms/eventForm', { authenticated: false });
         if (!configResponse.ok) {
           throw new Error('Failed to load form configuration');
         }
@@ -34,7 +34,7 @@ export const EventRegistration = ({ editMode = false }: EventRegistrationProps) 
 
         // If editing, fetch existing event data
         if (editMode && id) {
-          const eventResponse = await fetch(`${getApiBaseUrl()}/api/events/${id}`);
+          const eventResponse = await apiClient(`/api/events/${id}`);
           if (!eventResponse.ok) {
             throw new Error('Failed to load event data');
           }
@@ -55,14 +55,11 @@ export const EventRegistration = ({ editMode = false }: EventRegistrationProps) 
 
   const handleSubmit = async (values: Record<string, string | boolean>) => {
     try {
-      const url = editMode && id
-        ? `${getApiBaseUrl()}/api/events/${id}`
-        : `${getApiBaseUrl()}/api/events`;
+      const endpoint = editMode && id ? `/api/events/${id}` : '/api/events';
       const method = editMode ? 'PUT' : 'POST';
 
-      const response = await fetch(url, {
+      const response = await apiClient(endpoint, {
         method,
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(values),
       });
       if (!response.ok) {

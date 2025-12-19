@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useParams, useHistory, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import {
@@ -35,41 +35,9 @@ import {
 
 import { APP_TITLE } from '../utils/constants';
 import { getApiBaseUrl } from '../utils/api';
-import { reportError } from '../utils/errorReporter';
-
-interface EventData {
-  eventName?: string;
-  hostName?: string;
-  hostContact?: string;
-  eventDate?: string;
-  eventTime?: string;
-  partySize?: string;
-  specialRequests?: string;
-  largePartyAgreement?: boolean;
-}
-
-interface Event {
-  id: string;
-  data: EventData;
-  createdAt: string;
-  completedTasks?: string[];
-}
-
-interface CountdownTime {
-  days: number;
-  hours: number;
-  minutes: number;
-  seconds: number;
-  passed: boolean;
-}
-
-interface Task {
-  id: string;
-  name: string;
-  description: string;
-  deadline: number;
-  subtasks?: string[];
-}
+import { useEvent } from '../hooks/useEvent';
+import { useTasks, Task } from '../hooks/useTasks';
+import { useEventCountdown } from '../hooks/useEventCountdown';
 
 const parseEventDate = (dateStr?: string, timeStr?: string): Date | null => {
   if (!dateStr) return null;
@@ -92,25 +60,6 @@ const parseEventDate = (dateStr?: string, timeStr?: string): Date | null => {
   }
 };
 
-const calculateCountdown = (targetDate: Date | null): CountdownTime => {
-  if (!targetDate) return { days: 0, hours: 0, minutes: 0, seconds: 0, passed: true };
-
-  const now = new Date().getTime();
-  const target = targetDate.getTime();
-  const difference = target - now;
-
-  if (difference <= 0) {
-    return { days: 0, hours: 0, minutes: 0, seconds: 0, passed: true };
-  }
-
-  return {
-    days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-    hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-    minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
-    seconds: Math.floor((difference % (1000 * 60)) / 1000),
-    passed: false,
-  };
-};
 
 const CountdownDisplay = ({ days, hours }: { days: number; hours: number }) => {
   const isUnder24Hours = days === 0;
@@ -167,72 +116,24 @@ const InfoRow = ({
 export const EventDashboard = () => {
   const { id } = useParams<{ id: string }>();
   const history = useHistory();
-  const [event, setEvent] = useState<Event | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [countdown, setCountdown] = useState<CountdownTime>({
-    days: 0,
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-    passed: true,
-  });
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set());
+
+  // Use custom hooks for data fetching
+  const { event, loading, error } = useEvent(id);
+  const { tasks } = useTasks();
+  const countdown = useEventCountdown(event?.data.eventDate, event?.data.eventTime);
+
+  // Local state for task management
+  const [completedTasks, setCompletedTasks] = useState<Set<string>>(
+    new Set(event?.completedTasks || [])
+  );
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
 
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const response = await fetch(`${getApiBaseUrl()}/api/tasks`);
-        if (response.ok) {
-          const data = await response.json();
-          setTasks(data.tasks || []);
-        }
-      } catch {
-        // Tasks are optional, don't show error
-      }
-    };
-
-    fetchTasks();
-  }, []);
-
-  useEffect(() => {
-    const fetchEvent = async () => {
-      try {
-        const response = await fetch(`${getApiBaseUrl()}/api/events/${id}`);
-        if (!response.ok) {
-          throw new Error('Event not found');
-        }
-        const data = await response.json();
-        setEvent(data);
-        setCompletedTasks(new Set(data.completedTasks || []));
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'An error occurred';
-        setError(errorMessage);
-        reportError(err instanceof Error ? err : new Error(errorMessage), 'api');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchEvent();
-  }, [id]);
-
-  useEffect(() => {
-    if (!event) return;
-
-    const eventDate = parseEventDate(event.data.eventDate, event.data.eventTime);
-
-    const updateCountdown = () => {
-      setCountdown(calculateCountdown(eventDate));
-    };
-
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
-
-    return () => clearInterval(interval);
-  }, [event]);
+  // Update completedTasks when event data changes
+  React.useEffect(() => {
+    if (event?.completedTasks) {
+      setCompletedTasks(new Set(event.completedTasks));
+    }
+  }, [event?.completedTasks]);
 
   if (loading) {
     return (
