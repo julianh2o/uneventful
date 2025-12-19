@@ -139,6 +139,39 @@ export const DynamicForm = ({ config, initialValues, onSubmit }: DynamicFormProp
 
     switch (field.type) {
       case 'text':
+      case 'date':
+      case 'time':
+        return (
+          <TextField
+            key={field.id}
+            id={field.id}
+            type={field.type}
+            label={field.label}
+            placeholder={field.placeholder}
+            required={field.required}
+            helperText={field.helperText}
+            value={(values[field.id] as string) || ''}
+            onChange={(e) => handleChange(field.id, e.target.value)}
+            disabled={field.disabled}
+            fullWidth
+            margin="normal"
+            InputLabelProps={field.type === 'date' || field.type === 'time' ? { shrink: true } : undefined}
+            css={css`
+              input[type='date']::-webkit-calendar-picker-indicator,
+              input[type='time']::-webkit-calendar-picker-indicator {
+                filter: invert(1);
+                opacity: 0.7;
+                cursor: pointer;
+              }
+              input[type='date']::-webkit-calendar-picker-indicator:hover,
+              input[type='time']::-webkit-calendar-picker-indicator:hover {
+                opacity: 1;
+              }
+            `}
+          />
+        );
+
+      case 'textarea':
         return (
           <TextField
             key={field.id}
@@ -149,7 +182,10 @@ export const DynamicForm = ({ config, initialValues, onSubmit }: DynamicFormProp
             helperText={field.helperText}
             value={(values[field.id] as string) || ''}
             onChange={(e) => handleChange(field.id, e.target.value)}
+            disabled={field.disabled}
             fullWidth
+            multiline
+            rows={4}
             margin="normal"
           />
         );
@@ -295,7 +331,12 @@ export const DynamicForm = ({ config, initialValues, onSubmit }: DynamicFormProp
         <Stepper activeStep={currentPage} sx={{ mb: 4 }}>
           {pages.map((page, index) => (
             <Step key={index}>
-              <StepLabel>{page.title}</StepLabel>
+              <StepLabel
+                onClick={() => setCurrentPage(index)}
+                sx={{ cursor: 'pointer' }}
+              >
+                {page.title}
+              </StepLabel>
             </Step>
           ))}
         </Stepper>

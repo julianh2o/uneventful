@@ -12,7 +12,7 @@ export interface FormFieldCondition {
 
 export interface FormField {
   id: string;
-  type: 'text' | 'select' | 'checkbox' | 'checkboxGroup';
+  type: 'text' | 'textarea' | 'date' | 'time' | 'select' | 'checkbox' | 'checkboxGroup';
   label: string;
   placeholder?: string;
   required?: boolean;
@@ -21,6 +21,7 @@ export interface FormField {
   checkboxLabel?: string;
   options?: FormFieldOption[];
   condition?: FormFieldCondition;
+  disabled?: boolean;
 }
 
 export interface FormPage {

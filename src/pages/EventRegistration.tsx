@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { Box, CircularProgress, Alert } from '@mui/material';
@@ -8,6 +8,7 @@ import { FormConfig } from '../types/FormConfig';
 import { APP_TITLE } from '../utils/constants';
 import { reportError } from '../utils/errorReporter';
 import { apiClient } from '../utils/apiClient';
+import { AuthContext } from '../contexts/AuthContext';
 
 interface EventRegistrationProps {
   editMode?: boolean;
@@ -16,10 +17,43 @@ interface EventRegistrationProps {
 export const EventRegistration = ({ editMode = false }: EventRegistrationProps) => {
   const history = useHistory();
   const { id } = useParams<{ id?: string }>();
+  const { user } = useContext(AuthContext);
   const [config, setConfig] = useState<FormConfig | null>(null);
   const [initialValues, setInitialValues] = useState<Record<string, string | boolean> | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const formatDateForStorage = (isoDate: string): string => {
+    // Convert YYYY-MM-DD to MM/DD/YYYY
+    const [year, month, day] = isoDate.split('-');
+    return `${month}/${day}/${year}`;
+  };
+
+  const formatDateForInput = (usDate: string): string => {
+    // Convert MM/DD/YYYY to YYYY-MM-DD
+    const [month, day, year] = usDate.split('/');
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  };
+
+  const formatTimeForStorage = (time24: string): string => {
+    // Convert HH:MM (24-hour) to h:MM AM/PM (12-hour)
+    const [hours24, minutes] = time24.split(':').map(Number);
+    const period = hours24 >= 12 ? 'PM' : 'AM';
+    const hours12 = hours24 % 12 || 12; // Convert 0 to 12 for midnight
+    return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`;
+  };
+
+  const formatTimeForInput = (time12: string): string => {
+    // Convert h:MM AM/PM to HH:MM (24-hour)
+    const match = time12.match(/(\d+):(\d+)\s*(AM|PM)/i);
+    if (!match) return time12;
+    let hours = parseInt(match[1], 10);
+    const minutes = match[2];
+    const period = match[3].toUpperCase();
+    if (period === 'PM' && hours !== 12) hours += 12;
+    if (period === 'AM' && hours === 12) hours = 0;
+    return `${hours.toString().padStart(2, '0')}:${minutes}`;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,14 +66,35 @@ export const EventRegistration = ({ editMode = false }: EventRegistrationProps) 
         const configData = await configResponse.json();
         setConfig(configData);
 
-        // If editing, fetch existing event data
+        // Prepare initial values with user data
+        const baseValues: Record<string, string | boolean> = {};
+
+        // Auto-populate host fields from logged-in user
+        if (user) {
+          baseValues.hostName = user.name;
+          baseValues.hostContact = user.phone;
+        }
+
+        // If editing, fetch existing event data and merge with user data
         if (editMode && id) {
           const eventResponse = await apiClient(`/api/events/${id}`);
           if (!eventResponse.ok) {
             throw new Error('Failed to load event data');
           }
           const eventData = await eventResponse.json();
-          setInitialValues(eventData.data);
+
+          // Convert date/time from storage format to input format for editing
+          const formattedData = { ...eventData.data };
+          if (formattedData.eventDate && typeof formattedData.eventDate === 'string' && formattedData.eventDate.includes('/')) {
+            formattedData.eventDate = formatDateForInput(formattedData.eventDate);
+          }
+          if (formattedData.eventTime && typeof formattedData.eventTime === 'string' && (formattedData.eventTime.includes('AM') || formattedData.eventTime.includes('PM'))) {
+            formattedData.eventTime = formatTimeForInput(formattedData.eventTime);
+          }
+
+          setInitialValues({ ...baseValues, ...formattedData });
+        } else {
+          setInitialValues(baseValues);
         }
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'An error occurred';
@@ -51,16 +106,25 @@ export const EventRegistration = ({ editMode = false }: EventRegistrationProps) 
     };
 
     fetchData();
-  }, [editMode, id]);
+  }, [editMode, id, user, formatDateForInput, formatTimeForInput]);
 
   const handleSubmit = async (values: Record<string, string | boolean>) => {
     try {
+      // Transform date and time to expected format
+      const transformedValues = { ...values };
+      if (typeof values.eventDate === 'string' && values.eventDate.includes('-')) {
+        transformedValues.eventDate = formatDateForStorage(values.eventDate);
+      }
+      if (typeof values.eventTime === 'string' && !values.eventTime.includes('AM') && !values.eventTime.includes('PM')) {
+        transformedValues.eventTime = formatTimeForStorage(values.eventTime);
+      }
+
       const endpoint = editMode && id ? `/api/events/${id}` : '/api/events';
       const method = editMode ? 'PUT' : 'POST';
 
       const response = await apiClient(endpoint, {
         method,
-        body: JSON.stringify(values),
+        body: JSON.stringify(transformedValues),
       });
       if (!response.ok) {
         throw new Error(editMode ? 'Failed to update event' : 'Failed to submit event');

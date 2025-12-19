@@ -1,10 +1,9 @@
 title: Event Registration
-description: |
-  So you'd like to host an event at the Bawdy Shop? Great! We'd love to have your event here. This questionnaire lets us get a sense for the shape of your event so that we can set our expectations appropriately, communicate effectively, and facilitate accordingly!
 
 pages:
-  - title: Basic Information
-    description: Tell us about your event and who's hosting it.
+  - title: Event Information
+    description: |
+      So you'd like to host an event at the Bawdy Shop? Great! We'd love to have your event here. This questionnaire lets us get a sense for the shape of your event so that we can set our expectations appropriately, communicate effectively, and facilitate accordingly!
     fields:
       - id: eventName
         type: text
@@ -17,27 +16,29 @@ pages:
         label: Host Name
         placeholder: Enter the host's full name
         required: true
+        disabled: true
 
       - id: hostContact
         type: text
         label: Host Contact
         placeholder: Email or phone number
         required: true
-        helperText: We'll use this to send confirmation details.
+        disabled: true
 
-  - title: Event Details
-    description: Provide details about the size and timing of your event.
-    fields:
+      - id: eventDescription
+        type: textarea
+        label: Event Description
+        placeholder: Describe your event...
+        required: true
+
       - id: eventDate
-        type: text
+        type: date
         label: Event Date
-        placeholder: MM/DD/YYYY
         required: true
 
       - id: eventTime
-        type: text
+        type: time
         label: Event Time
-        placeholder: e.g., 6:00 PM
         required: true
 
       - id: partySize
@@ -45,23 +46,16 @@ pages:
         label: Party Size
         required: true
         options:
-          - value: "1-10"
-            label: "1-10 guests"
-          - value: "11-20"
-            label: "11-20 guests"
-          - value: "21-50"
-            label: "21-50 guests"
-          - value: "51-100"
-            label: "51-100 guests"
-          - value: "100+"
-            label: "More than 100 guests"
-
-      - id: specialRequests
-        type: text
-        label: Special Requests
-        placeholder: Any dietary restrictions, accessibility needs, etc.
-        required: false
-        helperText: Optional - let us know how we can accommodate your guests.
+          - value: '1-10'
+            label: '1-10 guests'
+          - value: '11-20'
+            label: '11-20 guests'
+          - value: '21-50'
+            label: '21-50 guests'
+          - value: '51-100'
+            label: '51-100 guests'
+          - value: '100+'
+            label: 'More than 100 guests'
 
   - title: Invitation Policy
     description: |
@@ -76,16 +70,16 @@ pages:
         label: Who would you like to invite?
         required: true
         options:
-          - value: "private"
-            label: "Private (I will pick and choose all invitees)"
-          - value: "besties"
-            label: "Open to Bawdy Besties"
-          - value: "buddies"
-            label: "Blast to all Bawdy Buddies"
+          - value: 'private'
+            label: 'Private (I will pick and choose all invitees)'
+          - value: 'besties'
+            label: 'Open to Bawdy Besties'
+          - value: 'buddies'
+            label: 'Blast to all Bawdy Buddies'
 
       - id: plusOnePolicy
         type: text
-        label: "+1 Policy"
+        label: '+1 Policy'
         placeholder: Describe your +1 policy...
         required: true
         helperText: Describe in detail the +1 policy. Number permitted, communication requirements, RSVP tracking, etc.
@@ -98,35 +92,36 @@ pages:
         label: Which spaces will your event use?
         required: true
         options:
-          - value: "pool"
-            label: "Pool"
-          - value: "hot-tub"
-            label: "Hot Tub"
-          - value: "flat-top"
-            label: "Flat Top"
-          - value: "smokers-corner"
-            label: "Smokers Corner (behind kitchen)"
-          - value: "kitchen-snacks"
-            label: "Kitchen (snacks only, no dishes)"
-          - value: "kitchen-food"
-            label: "Kitchen (food, but no cooking)"
-          - value: "kitchen-cooking"
-            label: "Kitchen (cooking)"
-          - value: "bar"
-            label: "Bar (keg/alcohol)"
-          - value: "dance-floor"
-            label: "Dance Floor (near DJ stand)"
-          - value: "living-room"
-            label: "Living Room"
-          - value: "office"
-            label: "Office"
-          - value: "red-room"
-            label: "Red Room"
+          - value: 'pool'
+            label: 'Pool'
+          - value: 'hot-tub'
+            label: 'Hot Tub'
+          - value: 'flat-top'
+            label: 'Flat Top'
+          - value: 'smokers-corner'
+            label: 'Smokers Corner (behind kitchen)'
+          - value: 'kitchen-snacks'
+            label: 'Kitchen (snacks only, no dishes)'
+          - value: 'kitchen-food'
+            label: 'Kitchen (food, but no cooking)'
+          - value: 'kitchen-cooking'
+            label: 'Kitchen (cooking)'
+          - value: 'bar'
+            label: 'Bar (keg/alcohol)'
+          - value: 'dance-floor'
+            label: 'Dance Floor (near DJ stand)'
+          - value: 'living-room'
+            label: 'Living Room'
+          - value: 'office'
+            label: 'Office'
+          - value: 'red-room'
+            label: 'Red Room'
 
   - title: Use Considerations
     description: Based on your selections, please review and agree to the following considerations.
     fields:
       - id: kitchenAgreement
+        title: Kitchen
         type: checkbox
         label: Kitchen Use Agreement
         description: |
@@ -143,11 +138,12 @@ pages:
           field: spaceUse
           operator: containsAny
           values:
-            - "kitchen-snacks"
-            - "kitchen-food"
-            - "kitchen-cooking"
+            - 'kitchen-snacks'
+            - 'kitchen-food'
+            - 'kitchen-cooking'
 
       - id: hotTubAgreement
+        title: Hot Tub
         type: checkbox
         label: Hot Tub Use Agreement
         description: |
@@ -165,9 +161,10 @@ pages:
         condition:
           field: spaceUse
           operator: contains
-          value: "hot-tub"
+          value: 'hot-tub'
 
       - id: largePartyAgreement
+        title: Large Party
         type: checkbox
         label: Large Party Agreement
         description: |
@@ -185,6 +182,6 @@ pages:
           field: partySize
           operator: in
           values:
-            - "21-50"
-            - "51-100"
-            - "100+"
+            - '21-50'
+            - '51-100'
+            - '100+'
