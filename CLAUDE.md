@@ -11,31 +11,31 @@ uneventful is an event management application built on a React/TypeScript fronte
 ### Development
 ```bash
 # Frontend (React on port 2999)
-npm start
+yarn start
 
 # Backend server (development mode with hot reload)
-npm run server:dev
+yarn server:dev
 
 # Backend server (production)
-npm run server
+yarn server
 
 # Build production frontend
-npm run build
+yarn build
 ```
 
 ### Testing and Code Quality
 ```bash
 # Run frontend tests
-npm test
+yarn test
 
 # Run server tests
-npm run test:server
+yarn test:server
 
 # Lint code
-npm lint
+yarn lint
 
 # Format code with Prettier
-npm format
+yarn format
 ```
 
 ## Architecture
@@ -200,8 +200,8 @@ Backend uses `.env` file with:
 ## Deployment Notes
 
 Production deployment requires:
-1. Build frontend: `npm run build`
-2. Start server: `npm run server` (serves both API and static build)
+1. Build frontend: `yarn build`
+2. Start server: `yarn server` (serves both API and static build)
 3. Ensure `.env` configured with production values
 4. Server listens on PORT from env or 3001
 5. Frontend automatically detects production environment and uses same-origin API calls

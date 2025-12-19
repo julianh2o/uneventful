@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import {
   Box,
   CircularProgress,
@@ -71,7 +71,7 @@ const parseEventDate = (dateStr?: string, timeStr?: string): Date | null => {
 
 export const TaskDetail = () => {
   const { id: eventId, taskId } = useParams<{ id: string; taskId: string }>();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [event, setEvent] = useState<Event | null>(null);
   const [task, setTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
@@ -200,7 +200,7 @@ export const TaskDetail = () => {
       <Box sx={{ p: 3 }}>
         {/* Back Button */}
         <IconButton
-          onClick={() => history.push(`/event/${eventId}`)}
+          onClick={() => navigate(`/event/${eventId}`)}
           sx={{ mb: 2 }}
         >
           <ArrowBackIcon />

@@ -1,6 +1,6 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
-import { Helmet } from 'react-helmet';
+import { createRoot } from 'react-dom/client';
+import { Helmet, HelmetProvider } from 'react-helmet-async';
 
 import App from './App';
 
@@ -25,15 +25,20 @@ window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent) => 
 	reportError(error, 'runtime');
 });
 
-ReactDOM.render(
+const container = document.getElementById('root');
+if (!container) throw new Error('Root element not found');
+
+const root = createRoot(container);
+root.render(
 	<React.StrictMode>
-		<Helmet>
-			<title>{APP_TITLE}</title>
-			<meta name='description' content={APP_DESCRIPTION} />
-			<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap' />
-			<meta name='viewport' content='initial-scale=1, width=device-width' />
-		</Helmet>
-		<App />
-	</React.StrictMode>,
-	document.getElementById('root')
+		<HelmetProvider>
+			<Helmet>
+				<title>{APP_TITLE}</title>
+				<meta name='description' content={APP_DESCRIPTION} />
+				<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap' />
+				<meta name='viewport' content='initial-scale=1, width=device-width' />
+			</Helmet>
+			<App />
+		</HelmetProvider>
+	</React.StrictMode>
 );

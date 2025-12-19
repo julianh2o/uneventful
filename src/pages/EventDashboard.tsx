@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useParams, useHistory, Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import {
   Box,
   CircularProgress,
@@ -115,10 +115,10 @@ const InfoRow = ({
 
 export const EventDashboard = () => {
   const { id } = useParams<{ id: string }>();
-  const history = useHistory();
+  const navigate = useNavigate();
 
   // Use custom hooks for data fetching
-  const { event, loading, error } = useEvent(id);
+  const { event, loading, error } = useEvent(id || '');
   const { tasks } = useTasks();
   const countdown = useEventCountdown(event?.data.eventDate, event?.data.eventTime);
 
@@ -134,6 +134,10 @@ export const EventDashboard = () => {
       setCompletedTasks(new Set(event.completedTasks));
     }
   }, [event?.completedTasks]);
+
+  if (!id) {
+    return <Alert severity="error">Event ID is missing</Alert>;
+  }
 
   if (loading) {
     return (
@@ -245,7 +249,7 @@ export const EventDashboard = () => {
           <Button
             variant="outlined"
             startIcon={<EditIcon />}
-            onClick={() => history.push(`/event/${id}/edit`)}
+            onClick={() => navigate(`/event/${id}/edit`)}
             sx={{
               position: 'absolute',
               top: 16,

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { CssBaseline, ThemeProvider } from '@mui/material';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 import { Layout } from './components/Layout';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -32,9 +32,11 @@ function App() {
 
 	const theme = useMemo(() => getAppTheme(mode), [mode]);
 
-	const addRoute = (route: AppRoute) => (
-		<ProtectedRoute key={route.key} path={route.path} component={route.component!} exact />
-	);
+	const addRoute = (route: AppRoute) => {
+		const Component = route.component;
+		if (!Component) return null;
+		return <Route key={route.key} path={route.path} element={<ProtectedRoute><Component /></ProtectedRoute>} />;
+	};
 
 	return (
 		<ThemeModeContext.Provider value={themeMode}>
@@ -43,25 +45,23 @@ function App() {
 				<Router>
 					<ErrorBoundary>
 						<AuthProvider>
-							<Switch>
-								<Route path='/login' component={Login} exact />
-								<Route path='/auth/verify' component={AuthVerify} exact />
+							<Routes>
+								<Route path='/login' element={<Login />} />
+								<Route path='/auth/verify' element={<AuthVerify />} />
 
-								<Route path='/'>
+								<Route path='/*' element={
 									<Layout>
-										<Switch>
-											<ProtectedRoute path='/event/:id/task/:taskId' component={TaskDetail} exact />
-											<ProtectedRoute path='/event/:id/edit' exact>
-												<EventRegistration editMode />
-											</ProtectedRoute>
-											<ProtectedRoute path='/event/:id' component={EventDashboard} exact />
+										<Routes>
+											<Route path='/event/:id/task/:taskId' element={<ProtectedRoute><TaskDetail /></ProtectedRoute>} />
+											<Route path='/event/:id/edit' element={<ProtectedRoute><EventRegistration editMode /></ProtectedRoute>} />
+											<Route path='/event/:id' element={<ProtectedRoute><EventDashboard /></ProtectedRoute>} />
 											{routes.map((route: AppRoute) =>
 												route.subRoutes ? route.subRoutes.map((item: AppRoute) => addRoute(item)) : addRoute(route)
 											)}
-										</Switch>
+										</Routes>
 									</Layout>
-								</Route>
-							</Switch>
+								} />
+							</Routes>
 						</AuthProvider>
 					</ErrorBoundary>
 				</Router>

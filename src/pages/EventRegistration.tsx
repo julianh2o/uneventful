@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
-import { useHistory, useParams } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { Box, CircularProgress, Alert } from '@mui/material';
 
 import { DynamicForm } from '../components/DynamicForm';
@@ -47,7 +47,7 @@ const formatTimeForInput = (time12: string): string => {
 };
 
 export const EventRegistration = ({ editMode = false }: EventRegistrationProps) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const { id } = useParams<{ id?: string }>();
   const { user } = useContext(AuthContext);
   const [config, setConfig] = useState<FormConfig | null>(null);
@@ -131,7 +131,7 @@ export const EventRegistration = ({ editMode = false }: EventRegistrationProps) 
       }
       const responseData = await response.json();
       const eventId = editMode ? id : responseData.id;
-      history.push(`/event/${eventId}`);
+      navigate(`/event/${eventId}`);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An error occurred';
       alert(`Error: ${errorMessage}`);

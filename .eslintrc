@@ -12,7 +12,8 @@
         "react/react-in-jsx-scope": 0,
         "import/no-unresolved": 0,
         "no-unused-vars": 0,
-        "react/no-unknown-property": ["error", { "ignore": ["css"] }]
+        "react/no-unknown-property": ["error", { "ignore": ["css"] }],
+        "react-hooks/set-state-in-effect": "warn"
     },
     "plugins": [
         "react",

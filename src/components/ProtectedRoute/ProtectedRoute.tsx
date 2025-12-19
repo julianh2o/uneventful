@@ -1,15 +1,13 @@
 import React, { FC, ReactNode } from 'react';
-import { Route, Redirect } from 'react-router-dom';
-import type { RouteProps } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { Box, CircularProgress } from '@mui/material';
 import { useAuth } from '../../hooks/useAuth';
 
-interface ProtectedRouteProps extends Omit<RouteProps, 'component'> {
-  component?: React.ComponentType<any>;
-  children?: ReactNode;
+interface ProtectedRouteProps {
+  children: ReactNode;
 }
 
-export const ProtectedRoute: FC<ProtectedRouteProps> = ({ component: Component, children, ...rest }) => {
+export const ProtectedRoute: FC<ProtectedRouteProps> = ({ children }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -27,20 +25,9 @@ export const ProtectedRoute: FC<ProtectedRouteProps> = ({ component: Component, 
     );
   }
 
-  return (
-    <Route
-      {...rest}
-      render={(props) =>
-        user ? (
-          Component ? (
-            <Component {...props} />
-          ) : (
-            children
-          )
-        ) : (
-          <Redirect to="/login" />
-        )
-      }
-    />
-  );
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
 };

@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import { Helmet } from 'react-helmet';
+import { Helmet } from 'react-helmet-async';
 import { Box, Paper, Typography, TextField, Button, Alert, CircularProgress } from '@mui/material';
 import { Phone, Person } from '@mui/icons-material';
 

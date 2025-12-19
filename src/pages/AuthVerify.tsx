@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
-import { Helmet } from 'react-helmet';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { Box, Paper, Typography, CircularProgress, Alert } from '@mui/material';
 import { CheckCircle, Error } from '@mui/icons-material';
 
@@ -9,7 +9,7 @@ import { verifyMagicLink } from '../services/authService';
 import { useAuth } from '../hooks/useAuth';
 
 export const AuthVerify = () => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
 
@@ -40,7 +40,7 @@ export const AuthVerify = () => {
         setStatus('success');
 
         setTimeout(() => {
-          history.push('/');
+          navigate('/');
         }, 1000);
       } catch (err) {
         setStatus('error');
@@ -49,7 +49,7 @@ export const AuthVerify = () => {
     };
 
     verify();
-  }, [location, login, history]);
+  }, [location, login, navigate]);
 
   return (
     <>

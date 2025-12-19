@@ -1,6 +1,6 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
-import { FC, useState } from 'react';
+import { FC, ReactNode, useState } from 'react';
 import { Box } from '@mui/material';
 
 import { Navigation } from '../Navigation';
@@ -9,7 +9,11 @@ import { Footer } from '../Footer';
 
 import { FOOTER_HEIGHT } from '../../utils/constants';
 
-export const Layout: FC = ({ children }) => {
+interface LayoutProps {
+	children: ReactNode;
+}
+
+export const Layout: FC<LayoutProps> = ({ children }) => {
 	const [open, setOpen] = useState(false);
 	const toggleNavigation = () => setOpen((status) => !status);
 
