@@ -54,6 +54,7 @@
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\" --quiet",
     "server": "ts-node --project server/tsconfig.json server/index.ts",
     "server:dev": "NODE_ENV=development nodemon --watch server --ext ts --exec 'ts-node --project server/tsconfig.json server/index.ts'",
+    "server:prod-local": "NODE_ENV=production PORT=3001 ts-node --project server/tsconfig.json server/index.ts",
     "test:server": "jest --config server/jest.config.js"
   },
   "eslintConfig": {

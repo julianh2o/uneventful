@@ -60,8 +60,10 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from the React app build directory
-app.use(express.static(path.join(__dirname, '..', 'build')));
+// Serve static files from the React app build directory in production
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '..', 'build')));
+}
 
 // Initialize users file
 initializeUsersFile();
@@ -294,7 +296,7 @@ app.get('/api/forms/:formName', (req, res) => {
 });
 
 // Endpoint to get tasks configuration
-app.get('/api/tasks', (req, res) => {
+app.get('/api/tasks', (_req, res) => {
   const yamlPath = path.join(__dirname, '..', 'src', 'config', 'tasks.yaml');
 
   try {
@@ -425,8 +427,10 @@ app.post('/api/errors', (req, res) => {
 // Catch-all route to serve React app for client-side routing
 // This must be after all API routes
 if (process.env.NODE_ENV === 'production') {
-  app.get(/^\/(?!api).*/, (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'build', 'index.html'));
+  app.use(express.static(path.join(__dirname, 'build')));
+
+  app.get('/*', function (req, res) {
+    res.sendFile(path.join(__dirname, 'build', 'index.html'));
   });
 }
 
