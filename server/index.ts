@@ -60,6 +60,9 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+// Serve static files from the React app build directory
+app.use(express.static(path.join(__dirname, '..', 'build')));
+
 // Initialize users file
 initializeUsersFile();
 
@@ -417,6 +420,12 @@ app.post('/api/errors', (req, res) => {
   });
 
   res.status(200).json({ received: true });
+});
+
+// Catch-all route to serve React app for client-side routing
+// This must be after all API routes
+app.get(/^\/(?!api).*/, (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'build', 'index.html'));
 });
 
 // Only start the server if this file is run directly
