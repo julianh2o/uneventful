@@ -77,23 +77,28 @@ try {
 
 const buildDate = new Date().toISOString();
 
-// Ensure buildx builder exists
+// Ensure buildx builder exists and is bootstrapped
 info('Setting up Docker buildx...');
 try {
   execSync('docker buildx inspect multiplatform', { stdio: 'pipe' });
   info('Using existing buildx builder');
+  // Make sure it's the active builder
+  exec('docker buildx use multiplatform', { silent: true });
 } catch (err) {
   info('Creating buildx builder...');
-  exec('docker buildx create --name multiplatform --use');
+  exec('docker buildx create --name multiplatform --driver docker-container --use');
+  info('Bootstrapping buildx builder...');
+  exec('docker buildx inspect --bootstrap');
 }
 
-// Build and push multi-platform Docker image
-info('Step 1/1: Building and pushing multi-platform Docker image...');
-log(`Building ${imageName}:${version} for linux/amd64,linux/arm64...`, 'yellow');
+// Build and push Docker image
+info('Step 1/1: Building and pushing Docker image...');
+log(`Building ${imageName}:${version} for linux/amd64...`, 'yellow');
 
 exec(
   `docker buildx build ` +
-  `--platform linux/amd64,linux/arm64 ` +
+  `--builder multiplatform ` +
+  `--platform linux/amd64 ` +
   `--build-arg VERSION=${version} ` +
   `--build-arg BUILD_DATE=${buildDate} ` +
   `--build-arg VCS_REF=${vcsRef} ` +
