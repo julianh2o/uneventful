@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { formatSmsMessage } from './smsMessages';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 const MAGIC_LINK_EXPIRY = '15m';
@@ -75,9 +76,9 @@ export const generateMagicLinkUrl = (token: string): string => {
   return `${APP_BASE_URL}/auth/verify?token=${token}`;
 };
 
-export const formatMagicLinkSms = (name: string | null, magicLinkUrl: string): string => {
-  const greeting = name ? `Hi ${name}!` : 'Hi!';
-  return `${greeting} Click here to sign in to uneventful: ${magicLinkUrl}
-
-This link expires in 15 minutes.`;
+export const formatMagicLinkSms = (name: string, magicLinkUrl: string): string => {
+  return formatSmsMessage('magicLink', {
+    name,
+    magicLinkUrl,
+  });
 };

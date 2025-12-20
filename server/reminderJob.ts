@@ -4,6 +4,7 @@ import path from 'path';
 import YAML from 'yaml';
 import { sendSms } from './sms';
 import { getAllEvents, Event } from './repositories/eventRepository';
+import { formatSmsMessage } from './smsMessages';
 
 // tsx provides __dirname polyfill in ESM mode
 const currentDir = __dirname;
@@ -112,7 +113,11 @@ export const checkAndSendReminders = async (): Promise<void> => {
     }
 
     const taskNames = dueTasks.map(t => t.name).join(', ');
-    const message = `Hi ${hostName}! Reminder: The following tasks for "${eventName}" are due today: ${taskNames}. - uneventful`;
+    const message = formatSmsMessage('taskReminder', {
+      hostName,
+      eventName,
+      taskNames,
+    });
 
     console.log(`Sending reminder to ${phoneNumber} for tasks: ${taskNames}`);
     const result = await sendSms({ to: phoneNumber, message });

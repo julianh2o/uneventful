@@ -1,0 +1,25 @@
+# SMS Message Templates
+# Templates support variable substitution using {{variableName}} syntax
+# All messages automatically include opt-out instructions
+
+messages:
+  # Authentication magic link message
+  magicLink:
+    template: |
+      unEventful Hi {{name}}, the link you requested to sign in to unEventful: {{magicLinkUrl}}
+
+      Expires in 15 minutes. Reply STOP to unsubscribe.
+    variables:
+      - name 
+      - magicLinkUrl
+
+  # Daily task reminder message
+  taskReminder:
+    template: |
+      unEventful: Hi {{hostName}}! Reminder: The following tasks for "{{eventName}}" are due today: {{taskNames}}.
+
+      Reply STOP to unsubscribe.
+    variables:
+      - hostName
+      - eventName
+      - taskNames

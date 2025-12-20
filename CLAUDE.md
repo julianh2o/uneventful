@@ -1,5 +1,8 @@
 # CLAUDE.md
 
+## Special instructions
+IMPORTANT: Do not build or release unless specifically asked or granted permission.
+
 ## Project Overview
 
 uneventful is an event management application with a React/TypeScript frontend and Express backend. Features include form-driven workflows, task tracking, and automated SMS reminders via Twilio.
