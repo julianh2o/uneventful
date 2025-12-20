@@ -93,20 +93,29 @@ export const updateUser = async (
 };
 
 export const normalizePhoneNumber = (phone: string): string => {
-  const digits = phone.replace(/\D/g, '');
+  // Remove all non-digit characters except leading '+'
+  let cleaned = phone.trim();
+  const hasPlus = cleaned.startsWith('+');
 
+  // Strip everything except digits
+  const digits = cleaned.replace(/\D/g, '');
+
+  // If already had a + prefix and has digits, use as-is
+  if (hasPlus && digits.length > 0) {
+    return `+${digits}`;
+  }
+
+  // 10 digits: assume US number, add +1
   if (digits.length === 10) {
     return `+1${digits}`;
   }
 
+  // 11 digits starting with 1: US number with country code
   if (digits.length === 11 && digits.startsWith('1')) {
     return `+${digits}`;
   }
 
-  if (phone.startsWith('+')) {
-    return phone;
-  }
-
+  // Any other format: add + and use as-is
   return `+${digits}`;
 };
 
