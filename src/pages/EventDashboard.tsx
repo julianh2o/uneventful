@@ -39,6 +39,7 @@ import { getApiBaseUrl } from '../utils/api';
 import { useEvent } from '../hooks/useEvent';
 import { useTasks, Task } from '../hooks/useTasks';
 import { useEventCountdown } from '../hooks/useEventCountdown';
+import { CatBat } from '../components/CatBat';
 
 const parseEventDate = (dateStr?: string, timeStr?: string): Date | null => {
   if (!dateStr) return null;
@@ -342,12 +343,14 @@ export const EventDashboard = () => {
                               variant="outlined"
                             />
                           )}
-                          <Chip
-                            size="small"
-                            label={formatDueDate(task.deadline)}
-                            color={overdue ? 'error' : 'default'}
-                            variant={overdue ? 'filled' : 'outlined'}
-                          />
+                          <CatBat enabled={overdue}>
+                            <Chip
+                              size="small"
+                              label={formatDueDate(task.deadline)}
+                              color={overdue ? 'error' : 'default'}
+                              variant={overdue ? 'filled' : 'outlined'}
+                            />
+                          </CatBat>
                         </Box>
                       }
                     >
