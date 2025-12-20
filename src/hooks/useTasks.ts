@@ -4,6 +4,7 @@ import { getApiBaseUrl } from '../utils/api';
 export interface Task {
   id: string;
   name: string;
+  summary?: string;
   description: string;
   deadline: number;
   subtasks?: string[];

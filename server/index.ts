@@ -21,6 +21,7 @@ import {
   findUserByPhone,
   createUser,
   findUserById,
+  updateUser,
   initializeUsersFile,
 } from './userStorage';
 import { sendSms } from './sms';
@@ -276,6 +277,33 @@ app.get('/api/auth/me', authenticateToken, (req, res) => {
   } catch (error) {
     console.error('Error in /api/auth/me:', error);
     return res.status(500).json({ error: 'Failed to fetch user' });
+  }
+});
+
+app.patch('/api/auth/me', authenticateToken, (req, res) => {
+  try {
+    const { name } = req.body;
+
+    if (!name || typeof name !== 'string' || name.trim().length === 0) {
+      return res.status(400).json({ error: 'Name is required' });
+    }
+
+    const updatedUser = updateUser(req.user!.id, { name: name.trim() });
+
+    return res.json({
+      id: updatedUser.id,
+      name: updatedUser.name,
+      phone: updatedUser.phone,
+      email: updatedUser.email,
+      isActive: updatedUser.isActive,
+      isAdmin: isAdmin(updatedUser.phone),
+      isVerified: updatedUser.isVerified,
+      createdAt: updatedUser.createdAt,
+      updatedAt: updatedUser.updatedAt,
+    });
+  } catch (error) {
+    console.error('Error in /api/auth/me PATCH:', error);
+    return res.status(500).json({ error: 'Failed to update profile' });
   }
 });
 

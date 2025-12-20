@@ -1,16 +1,23 @@
 tasks:
   - id: calendar-event
-    name: Create Calendar Event
-    description: Add the event to the shared calendar with all relevant details and invite key stakeholders.
+    name: Create Google Calendar Event
+    summary: Add the event to the Bawdy Shop Google Calendar with all details
+    description: |
+      **All events must be on the Bawdy Shop Google Calendar.**
+
+      If you do not have access to this calendar, you must coordinate with someone who does to ensure your event appears there.
+
+      **Important Steps:**
+      - Check if you have calendar access by visiting [this link](https://calendar.google.com/calendar/u/0/r?cid=OTAxYTEyNzYyMjhmYjY2MjYxYmZkN2RkMjcxODNlNDE2NjQ3MzZlODNiOWJhNWJhZGU0ZmZmZmZlNzdiZDJiZEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t) while logged into Google
+      - Ensure the calendar event's description clearly lists the invitation policy, hosts, and expectations
+      - If you need someone else to create the event, ask them to do so. For help, contact: julianh2o@gmail.com
+      - If you create an Event Poster, upload it to the Event Posters folder in Google Drive and link to it in the calendar event
+      - For broader audience events, consider adding `bawdybuddies@googlegroups.com` as a guest to email-blast the list and provide an RSVP avenue
     deadline: 14
-    subtasks:
-      - Create calendar entry with date and time
-      - Add event location and description
-      - Invite key stakeholders
-      - Set up reminders
 
   - id: event-poster
     name: Create Event Poster
+    summary: Design promotional materials and graphics for the event
     description: Design and finalize promotional materials including digital poster and social media graphics.
     deadline: 10
     subtasks:
@@ -21,6 +28,7 @@ tasks:
 
   - id: send-invites
     name: Send Invites
+    summary: Send invitations to all guests and track RSVPs
     description: Send out invitations to all guests via email or preferred communication channel.
     deadline: 7
     subtasks:
@@ -31,6 +39,7 @@ tasks:
 
   - id: space-reset
     name: Space Reset
+    summary: Clean and restore the venue to its original state
     description: Clean up the venue, return furniture to original positions, and dispose of any waste.
     deadline: -1
     subtasks:
@@ -41,6 +50,7 @@ tasks:
 
   - id: take-inventory
     name: Take Inventory
+    summary: Check and report supplies, inventory, and any damage
     description: |
       Hosts are expected to perform basic inventory during the process of setup or cleanup of an event. This is essential to making sure the Bawdy Shop stays functional for future events.
 

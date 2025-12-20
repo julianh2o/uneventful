@@ -1,9 +1,12 @@
 import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Box, Menu, MenuItem } from '@mui/material';
+import { AccountCircle as AccountCircleIcon } from '@mui/icons-material';
 
-import { Messages, Notifications, SignOut, Settings } from '../../Actions';
+import { SignOut, Settings } from '../../Actions';
 import { ThemeSwitcher } from '../ThemeSwitcher';
 import { ThemeModeContext } from '../../../contexts';
+import { useAuth } from '../../../hooks/useAuth';
 
 interface MobileMenuProps {
 	isMenuOpen: boolean;
@@ -14,6 +17,13 @@ interface MobileMenuProps {
 
 export const MobileMenu = ({ isMenuOpen, handleMenuOpen, handleMenuClose, anchorEl }: MobileMenuProps) => {
 	const { toggleThemeMode } = useContext(ThemeModeContext);
+	const { user } = useAuth();
+	const navigate = useNavigate();
+
+	const handleProfileClick = () => {
+		navigate('/profile');
+		handleMenuClose();
+	};
 
 	return (
 		<Menu
@@ -32,17 +42,13 @@ export const MobileMenu = ({ isMenuOpen, handleMenuOpen, handleMenuClose, anchor
 			onClose={handleMenuClose}
 		>
 			<Box sx={{ textAlign: 'center' }}>
+				<MenuItem onClick={handleProfileClick}>
+					<AccountCircleIcon sx={{ mr: 1 }} />
+					{user?.name || 'Profile'}
+				</MenuItem>
 				<MenuItem onClick={toggleThemeMode}>
 					<ThemeSwitcher disableTooltip />
 					Toggle Theme
-				</MenuItem>
-				<MenuItem onClick={handleMenuClose}>
-					<Messages total={15} disableTooltip />
-					Messages
-				</MenuItem>
-				<MenuItem onClick={handleMenuClose}>
-					<Notifications total={20} disableTooltip />
-					Notifications
 				</MenuItem>
 				<MenuItem onClick={handleMenuClose}>
 					<Settings disableTooltip />

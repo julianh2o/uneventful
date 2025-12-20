@@ -246,47 +246,23 @@ pages:
           - value: 'yes'
             label: "Yes, I'll have a poster"
 
-
   - title: General Expectations
     description: Based on your selections, please review and agree to the following considerations.
     fields:
-    - id: generalExpectationsAgreement
-      title: "I Agree"
-      type: checkbox
-      description: |
-        The Bawdy Shop is a community owned/operated space, this means that each and every person who occupies or uses the space is expected to share some responsibility for keeping the space healthy, clean, maintained, and functional.
+      - id: generalExpectationsAgreement
+        title: 'I Agree'
+        type: checkbox
+        description: |
+          The Bawdy Shop is a community owned/operated space, this means that each and every person who occupies or uses the space is expected to share some responsibility for keeping the space healthy, clean, maintained, and functional.
 
-        As an event host, it is important to both take on that responsibility personally and to model/communicate this responsibility to guests, cohosts, and volunteers.
+          As an event host, it is important to both take on that responsibility personally and to model/communicate this responsibility to guests, cohosts, and volunteers.
 
-        Keep in mind these general expectations and take steps to intentionally incorporate them into your event planning, communication, etc.
+          Keep in mind these general expectations and take steps to intentionally incorporate them into your event planning, communication, etc.
 
-        As long as there are guests on the property, there is at least one designated "host" who has been knowingly tasked with closing the space when the last person leaves. Hosts may delegate this to individuals who are very familiar with the space.
+          As long as there are guests on the property, there is at least one designated "host" who has been knowingly tasked with closing the space when the last person leaves. Hosts may delegate this to individuals who are very familiar with the space.
 
-        Events are expected to leave the space better than they found it. Incorporate into your planning some extra time to ensure that there is time to perform extra maintenance that may not be part of your basic party responsibilities.
+          Events are expected to leave the space better than they found it. Incorporate into your planning some extra time to ensure that there is time to perform extra maintenance that may not be part of your basic party responsibilities.
 
-        Don't forget, as events grow in size, ambition, and inebriation the amount of labor required to maintain these expectations increases dramatically. Be honest with yourself and your own bandwidth and make sure that you're including reliable volunteers to help share the responsibility, continued hosting privileges depend on this!
-      checkboxLabel: I Agree to the General Expectations
-      required: true
-
-    - id: gcalEvent
-      title: Google Calendar Event
-      type: checkboxGroup
-      description: |
-          **All events must be on the Bawdy Shop Google Calendar.**
-
-          If you do not have access to this calendar, you must coordinate with someone who does to ensure your event appears there.
-
-          - To check if you have access, [click here](https://calendar.google.com/calendar/u/0/r?cid=OTAxYTEyNzYyMjhmYjY2MjYxYmZkN2RkMjcxODNlNDE2NjQ3MzZlODNiOWJhNWJhZGU0ZmZmZmZlNzdiZDJiZEBncm91cC5jYWxlbmRhci5nb29nbGUuY29t) while logged into Google.
-          - Make sure the calendar event's description clearly lists the invitation policy, hosts, and expectations.
-          - If coordinating with someone else, ask them to create the event. If you need help, you may contact: julianh2o@gmail.com.
-          - If you create an Event Poster, you are encouraged to upload it to the Event Posters folder in Google Drive and link to it in the calendar event.
-          - Depending on the event audience, consider adding `bawdybuddies@googlegroups.com` as a guest to email-blast the list and provide an RSVP avenue.
-      checkboxLabel: Has a Google Calendar event been created for this event?
-      required: true
-      options:
-        - value: 'yes'
-          label: "Yes, I have created the event"
-        - value: 'delegate-confirmed'
-          label: "No, but I've asked someone and they have confirmed creation"
-        - value: 'delegate-pending'
-          label: "No, but I've reached out to someone and I'm waiting to hear back"
+          Don't forget, as events grow in size, ambition, and inebriation the amount of labor required to maintain these expectations increases dramatically. Be honest with yourself and your own bandwidth and make sure that you're including reliable volunteers to help share the responsibility, continued hosting privileges depend on this!
+        checkboxLabel: I Agree to the General Expectations
+        required: true

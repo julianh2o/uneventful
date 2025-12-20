@@ -52,6 +52,7 @@ function App() {
 								<Route path='/*' element={
 									<Layout>
 										<Routes>
+											<Route path='/register' element={<ProtectedRoute><EventRegistration /></ProtectedRoute>} />
 											<Route path='/event/:id/task/:taskId' element={<ProtectedRoute><TaskDetail /></ProtectedRoute>} />
 											<Route path='/event/:id/edit' element={<ProtectedRoute><EventRegistration editMode /></ProtectedRoute>} />
 											<Route path='/event/:id' element={<ProtectedRoute><EventDashboard /></ProtectedRoute>} />

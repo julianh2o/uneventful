@@ -15,12 +15,12 @@ import {
   Checkbox,
   Collapse,
   Button,
+  IconButton,
 } from '@mui/material';
 import {
   CheckCircle as CheckCircleIcon,
   RadioButtonUnchecked as UncheckedIcon,
-  ExpandMore as ExpandMoreIcon,
-  ExpandLess as ExpandLessIcon,
+  ChevronRight as ChevronRightIcon,
   Edit as EditIcon,
 } from '@mui/icons-material';
 import {
@@ -32,6 +32,7 @@ import {
   Email as ContactIcon,
   Notes as NotesIcon,
 } from '@mui/icons-material';
+import ReactMarkdown from 'react-markdown';
 
 import { APP_TITLE } from '../utils/constants';
 import { getApiBaseUrl } from '../utils/api';
@@ -320,8 +321,17 @@ export const EventDashboard = () => {
                 return (
                   <React.Fragment key={task.name}>
                     <ListItem
-                      sx={{ py: 0.5, cursor: hasSubtasks ? 'pointer' : 'default' }}
-                      onClick={() => hasSubtasks && toggleExpanded(task.name)}
+                      component={Link}
+                      to={`/event/${id}/task/${task.id}`}
+                      sx={{
+                        py: 0.5,
+                        cursor: 'pointer',
+                        textDecoration: 'none',
+                        color: 'inherit',
+                        '&:hover': {
+                          bgcolor: 'action.hover',
+                        },
+                      }}
                       secondaryAction={
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           {hasSubtasks && (
@@ -342,46 +352,58 @@ export const EventDashboard = () => {
                       }
                     >
                       <ListItemIcon sx={{ minWidth: 40 }}>
-                        {isCompleted ? (
-                          <CheckCircleIcon color="success" />
-                        ) : (
-                          <UncheckedIcon color="action" />
-                        )}
+                        <IconButton
+                          size="small"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            toggleExpanded(task.name);
+                          }}
+                          sx={{
+                            transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+                            transition: 'transform 0.2s',
+                          }}
+                        >
+                          <ChevronRightIcon />
+                        </IconButton>
                       </ListItemIcon>
                       <ListItemText
                         primary={
-                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                            <Link
-                              to={`/event/${id}/task/${task.id}`}
-                              onClick={(e) => e.stopPropagation()}
-                              style={{ textDecoration: 'none' }}
-                            >
-                              <Typography
-                                variant="body2"
-                                sx={{
-                                  textDecoration: isCompleted ? 'line-through' : 'none',
-                                  color: isCompleted ? 'text.secondary' : 'primary.main',
-                                  fontWeight: 'medium',
-                                  '&:hover': {
-                                    textDecoration: 'underline',
-                                  },
-                                }}
-                              >
-                                {task.name}
-                              </Typography>
-                            </Link>
-                            {hasSubtasks && (
-                              isExpanded ? <ExpandLessIcon fontSize="small" /> : <ExpandMoreIcon fontSize="small" />
-                            )}
-                          </Box>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              textDecoration: isCompleted ? 'line-through' : 'none',
+                              color: isCompleted ? 'text.secondary' : 'text.primary',
+                              fontWeight: 'medium',
+                            }}
+                          >
+                            {task.name}
+                          </Typography>
                         }
-                        secondary={task.description}
+                        secondary={task.summary || task.description}
                       />
                     </ListItem>
 
-                    {/* Subtasks */}
-                    {hasSubtasks && (
-                      <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+                    {/* Description and Subtasks */}
+                    <Collapse in={isExpanded} timeout="auto" unmountOnExit>
+                      {task.description && (
+                        <Box
+                          sx={{
+                            pl: 7,
+                            pr: 2,
+                            pb: 1,
+                            pt: 0.5,
+                            '& p': { margin: '0.5em 0', fontSize: '0.875rem' },
+                            '& ul, & ol': { margin: '0.5em 0', paddingLeft: '1.5em', fontSize: '0.875rem' },
+                            '& a': { color: 'primary.main', textDecoration: 'underline' },
+                            '& strong': { fontWeight: 'bold' },
+                            color: 'text.secondary',
+                          }}
+                        >
+                          <ReactMarkdown>{task.description}</ReactMarkdown>
+                        </Box>
+                      )}
+                      {hasSubtasks && (
                         <List dense disablePadding sx={{ pl: 4 }}>
                           {task.subtasks!.map((subtask) => {
                             const subtaskKey = getSubtaskKey(task.name, subtask);
@@ -415,8 +437,8 @@ export const EventDashboard = () => {
                             );
                           })}
                         </List>
-                      </Collapse>
-                    )}
+                      )}
+                    </Collapse>
                   </React.Fragment>
                 );
               })}

@@ -23,6 +23,7 @@ import {
   Assignment as TaskIcon,
   CalendarToday as CalendarIcon,
 } from '@mui/icons-material';
+import ReactMarkdown from 'react-markdown';
 
 import { APP_TITLE } from '../utils/constants';
 import { apiClient } from '../utils/apiClient';
@@ -223,9 +224,18 @@ export const TaskDetail = () => {
               {task.name}
             </Typography>
           </Box>
-          <Typography variant="body1" sx={{ mb: 3, opacity: 0.9 }}>
-            {task.description}
-          </Typography>
+          <Box
+            sx={{
+              mb: 3,
+              opacity: 0.9,
+              '& p': { margin: '0.5em 0' },
+              '& ul, & ol': { margin: '0.5em 0', paddingLeft: '1.5em' },
+              '& a': { color: 'inherit', textDecoration: 'underline' },
+              '& strong': { fontWeight: 'bold' },
+            }}
+          >
+            <ReactMarkdown>{task.description}</ReactMarkdown>
+          </Box>
           <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
             <Chip
               icon={<CalendarIcon sx={{ color: 'white !important' }} />}
@@ -235,11 +245,13 @@ export const TaskDetail = () => {
                 color: 'white',
               }}
             />
-            <Chip
-              label={`${completedCount}/${totalSubtasks} subtasks`}
-              sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
-            />
-            {isCompleted && (
+            {totalSubtasks > 0 && (
+              <Chip
+                label={`${completedCount}/${totalSubtasks} subtasks`}
+                sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
+              />
+            )}
+            {isCompleted && totalSubtasks > 0 && (
               <Chip
                 icon={<CheckCircleIcon sx={{ color: 'white !important' }} />}
                 label="Completed"
@@ -250,24 +262,26 @@ export const TaskDetail = () => {
         </Paper>
 
         {/* Progress */}
-        <Paper sx={{ p: 3, mb: 3 }}>
-          <Typography variant="h6" gutterBottom>
-            Progress
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Box sx={{ flexGrow: 1 }}>
-              <LinearProgress
-                variant="determinate"
-                value={progress}
-                sx={{ height: 10, borderRadius: 5 }}
-                color={isCompleted ? 'success' : 'primary'}
-              />
-            </Box>
-            <Typography variant="body2" color="text.secondary">
-              {Math.round(progress)}%
+        {totalSubtasks > 0 && (
+          <Paper sx={{ p: 3, mb: 3 }}>
+            <Typography variant="h6" gutterBottom>
+              Progress
             </Typography>
-          </Box>
-        </Paper>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+              <Box sx={{ flexGrow: 1 }}>
+                <LinearProgress
+                  variant="determinate"
+                  value={progress}
+                  sx={{ height: 10, borderRadius: 5 }}
+                  color={isCompleted ? 'success' : 'primary'}
+                />
+              </Box>
+              <Typography variant="body2" color="text.secondary">
+                {Math.round(progress)}%
+              </Typography>
+            </Box>
+          </Paper>
+        )}
 
         {/* Subtasks */}
         {task.subtasks && task.subtasks.length > 0 && (
