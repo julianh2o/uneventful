@@ -1,6 +1,6 @@
 {
   "name": "uneventful",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "uneventful - Your event management solution",
   "author": {
     "name": "Julian Hartline",
@@ -28,8 +28,9 @@
     "dev:client": "PORT=2998 react-scripts start",
     "dev:server": "NODE_ENV=development nodemon --watch server --ext ts --exec 'tsx server/index.ts'",
     "build": "react-scripts build",
-    "start": "NODE_ENV=production tsx server/index.ts",
-    "preview": "yarn build && yarn start",
+    "build:server": "tsc --project server/tsconfig.json",
+    "start": "NODE_ENV=production node server/dist/index.js",
+    "preview": "yarn build && yarn build:server && yarn start",
     "test": "yarn test:client && yarn test:server",
     "test:client": "vitest run --config vitest.config.ts",
     "test:server": "vitest run --config server/vitest.config.ts",
