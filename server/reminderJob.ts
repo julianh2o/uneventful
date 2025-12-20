@@ -55,7 +55,7 @@ const getDaysDifference = (eventDate: Date, today: Date): number => {
 };
 
 const getTasksDueToday = (event: Event, tasks: Task[], today: Date): Task[] => {
-  const eventDateStr = event.data.eventDate;
+  const eventDateStr = event.data.eventDate as string | undefined;
   if (!eventDateStr) return [];
 
   const eventDate = parseEventDate(eventDateStr);
@@ -96,9 +96,9 @@ export const checkAndSendReminders = async (): Promise<void> => {
 
     if (dueTasks.length === 0) continue;
 
-    const hostContact = event.data.hostContact;
-    const hostName = event.data.hostName || 'Host';
-    const eventName = event.data.eventName || 'your event';
+    const hostContact = event.data.hostContact as string | undefined;
+    const hostName = (event.data.hostName as string | undefined) || 'Host';
+    const eventName = (event.data.eventName as string | undefined) || 'your event';
 
     if (!hostContact) {
       console.log(`No contact info for event ${event.id}, skipping...`);

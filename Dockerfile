@@ -1,7 +1,7 @@
 # Multi-stage build for optimized production image
 
 # Stage 1: Build the application
-FROM node:20-alpine AS builder
+FROM node:20-slim AS builder
 
 WORKDIR /app
 
@@ -25,8 +25,11 @@ RUN npx prisma generate
 # Build the frontend
 RUN yarn build
 
+# Build the server (compile TypeScript to JavaScript)
+RUN yarn build:server
+
 # Stage 2: Production image
-FROM node:20-alpine
+FROM node:20-slim
 
 # Build arguments for version and metadata
 ARG VERSION=unknown
@@ -64,8 +67,8 @@ RUN npx prisma generate && \
 # Copy built frontend from builder stage
 COPY --from=builder /app/build ./build
 
-# Copy server code
-COPY server ./server
+# Copy compiled server code (JavaScript, not TypeScript)
+COPY --from=builder /app/server/dist ./server/dist
 
 # Copy config files needed at runtime
 COPY src/config ./src/config

@@ -424,7 +424,7 @@ app.post('/api/errors', (req, res) => {
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(currentDir, '..', 'build')));
 
-  app.get('/*', function (req, res) {
+  app.get('*', function (req, res) {
     res.sendFile(path.join(currentDir, '..', 'build', 'index.html'));
   });
 }
