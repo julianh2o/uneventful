@@ -65,11 +65,6 @@ const PORT = process.env.PORT || 2999;
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from the React app build directory in production
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(currentDir, '..', 'build')));
-}
-
 // Initialize users file
 initializeUsersFile();
 
