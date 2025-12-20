@@ -2,10 +2,13 @@
 import { css } from '@emotion/react';
 import ExitToApp from '@mui/icons-material/ExitToApp';
 import { IconButton, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { useAuth } from '../../../../hooks/useAuth';
 
 export const SignOutRoute = () => {
+	const { logout } = useAuth();
+
 	const handleSignOutClick = () => {
-		alert('Signing Out...');
+		logout();
 	};
 
 	return (

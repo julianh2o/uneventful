@@ -17,12 +17,17 @@ interface MobileMenuProps {
 
 export const MobileMenu = ({ isMenuOpen, handleMenuOpen, handleMenuClose, anchorEl }: MobileMenuProps) => {
 	const { toggleThemeMode } = useContext(ThemeModeContext);
-	const { user } = useAuth();
+	const { user, logout } = useAuth();
 	const navigate = useNavigate();
 
 	const handleProfileClick = () => {
 		navigate('/profile');
 		handleMenuClose();
+	};
+
+	const handleLogout = () => {
+		handleMenuClose();
+		logout();
 	};
 
 	return (
@@ -54,8 +59,8 @@ export const MobileMenu = ({ isMenuOpen, handleMenuOpen, handleMenuClose, anchor
 					<Settings disableTooltip />
 					Settings
 				</MenuItem>
-				<MenuItem onClick={handleMenuClose}>
-					<SignOut disableTooltip onClick={() => alert('Signing out...')} />
+				<MenuItem onClick={handleLogout}>
+					<SignOut disableTooltip />
 					Sign Out
 				</MenuItem>
 			</Box>
