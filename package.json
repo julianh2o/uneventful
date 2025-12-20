@@ -3,13 +3,12 @@
   "version": "1.0.0",
   "description": "uneventful - Your event management solution",
   "author": {
-    "name": "Dan Castro",
-    "url": "https://www.welcomedeveloper.com"
+    "name": "Julian Hartline",
+    "url": "https://uneventful.bawdyshop.space"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/danilocastronz/weldev-project-react-mui-ts-bp",
-    "directory": "weldev-project-react-mui-ts-bp"
+    "url": "https://github.com/julianh2o/uneventful",
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
