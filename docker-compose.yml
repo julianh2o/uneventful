@@ -1,0 +1,32 @@
+# Development Docker Compose Configuration
+# Builds the image locally from source
+# For production deployment, use docker-compose.prod.yml
+
+version: '3.8'
+
+services:
+  uneventful:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: uneventful-dev
+    ports:
+      - "2999:2999"
+    environment:
+      - PORT=2999
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - TWILIO_PHONE_NUMBER=${TWILIO_PHONE_NUMBER}
+      - JWT_SECRET=${JWT_SECRET}
+      - APP_BASE_URL=${APP_BASE_URL}
+      - NODE_ENV=production
+    volumes:
+      # Persist data files
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:2999/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

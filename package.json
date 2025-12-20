@@ -70,7 +70,8 @@
     "lint:fix": "eslint \"src/**/*.{js,jsx,ts,tsx}\" \"server/**/*.ts\" --fix",
     "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\" \"server/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.{js,jsx,ts,tsx}\" \"server/**/*.ts\"",
-    "typecheck": "tsc --noEmit && tsc --noEmit --project server/tsconfig.json"
+    "typecheck": "tsc --noEmit && tsc --noEmit --project server/tsconfig.json",
+    "release": "node scripts/release.js"
   },
   "eslintConfig": {
     "extends": [

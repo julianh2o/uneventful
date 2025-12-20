@@ -199,9 +199,168 @@ Backend uses `.env` file with:
 
 ## Deployment Notes
 
+### Traditional Deployment
+
 Production deployment requires:
 1. Build frontend: `yarn build`
 2. Start server: `yarn server` (serves both API and static build)
 3. Ensure `.env` configured with production values
 4. Server listens on PORT from env or 2999
 5. Frontend automatically detects production environment and uses same-origin API calls
+
+### Docker Deployment
+
+**Development with Docker Compose:**
+
+Use `docker-compose.yml` (default) to build and run locally:
+
+```bash
+# Create a .env file with your configuration:
+# TWILIO_ACCOUNT_SID=your_sid
+# TWILIO_AUTH_TOKEN=your_token
+# TWILIO_PHONE_NUMBER=your_number
+# JWT_SECRET=your_secret
+# APP_BASE_URL=http://localhost:2999
+
+# Start the application (builds from source)
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop the application
+docker-compose down
+```
+
+**Production with Docker Compose (recommended):**
+
+Use `docker-compose.prod.yml` to deploy the published image:
+
+```bash
+# Create a .env file with your production configuration:
+# TWILIO_ACCOUNT_SID=your_sid
+# TWILIO_AUTH_TOKEN=your_token
+# TWILIO_PHONE_NUMBER=your_number
+# JWT_SECRET=your_secret
+# APP_BASE_URL=https://your-domain.com
+
+# Start the application (uses published image from Docker Hub)
+docker-compose -f docker-compose.prod.yml up -d
+
+# View logs
+docker-compose -f docker-compose.prod.yml logs -f
+
+# Stop the application
+docker-compose -f docker-compose.prod.yml down
+```
+
+**Standalone Deployment:**
+
+The `docker-compose.prod.yml` file is completely standalone. You can:
+1. Copy just `docker-compose.prod.yml` to your production server
+2. Create a `.env` file with your configuration
+3. Run `docker-compose -f docker-compose.prod.yml up -d`
+
+No source code or build step required!
+
+**Manual Docker Run:**
+```bash
+# Build the Docker image locally
+docker build -t uneventful .
+
+# Or pull from Docker Hub
+docker pull julianh2o/uneventful:latest
+
+# Run the container
+docker run -d \
+  -p 2999:2999 \
+  -v $(pwd)/data:/app/data \
+  -e TWILIO_ACCOUNT_SID=your_sid \
+  -e TWILIO_AUTH_TOKEN=your_token \
+  -e TWILIO_PHONE_NUMBER=your_number \
+  -e JWT_SECRET=your_secret \
+  -e APP_BASE_URL=https://your-domain.com \
+  --name uneventful \
+  julianh2o/uneventful:latest
+```
+
+**Docker Configuration:**
+- Multi-stage build for optimized image size
+- Node.js 18 Alpine base image
+- Production dependencies only in final image
+- Data directory mounted as volume for persistence
+- Healthcheck endpoint at `/api/health`
+- Automatic restart unless stopped
+- Port 2999 exposed (configurable via PORT env var)
+- OCI-compliant image labels with version metadata
+
+### Publishing to Docker Hub
+
+**Prerequisites:**
+1. Create a Docker Hub account at https://hub.docker.com
+2. Login to Docker Hub locally:
+   ```bash
+   docker login
+   ```
+
+**Release Process:**
+
+Version management uses yarn's built-in `version` command, then `yarn release` builds and pushes:
+
+```bash
+# Step 1: Bump version (creates git commit and tag)
+yarn version --patch      # 2.0.0 -> 2.0.1
+yarn version --minor      # 2.0.0 -> 2.1.0
+yarn version --major      # 2.0.0 -> 3.0.0
+yarn version --new-version 3.5.0  # Custom version
+
+# Step 2: Build and push to Docker Hub
+yarn release
+
+# Step 3: Push git changes and tags
+git push && git push --tags
+```
+
+**What the release script does:**
+1. Reads current version from `package.json`
+2. Builds Docker image with version metadata (version, build date, git commit)
+3. Tags image with both specific version (e.g., `julianh2o/uneventful:2.0.1`) and `latest`
+4. Pushes both tags to Docker Hub
+
+**Docker Hub Repository:**
+- Images are published to `julianh2o/uneventful`
+
+**Manual Docker Build (if needed):**
+```bash
+# Build with version metadata
+docker build \
+  --build-arg VERSION=2.0.0 \
+  --build-arg BUILD_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+  --build-arg VCS_REF=$(git rev-parse --short HEAD) \
+  -t julianh2o/uneventful:2.0.0 \
+  -t julianh2o/uneventful:latest .
+
+# Push to Docker Hub
+docker push julianh2o/uneventful:2.0.0
+docker push julianh2o/uneventful:latest
+```
+
+**Using Published Images:**
+```bash
+# Pull specific version
+docker pull julianh2o/uneventful:2.0.0
+
+# Pull latest
+docker pull julianh2o/uneventful:latest
+
+# Run published image
+docker run -d \
+  -p 2999:2999 \
+  -v $(pwd)/data:/app/data \
+  -e TWILIO_ACCOUNT_SID=your_sid \
+  -e TWILIO_AUTH_TOKEN=your_token \
+  -e TWILIO_PHONE_NUMBER=your_number \
+  -e JWT_SECRET=your_secret \
+  -e APP_BASE_URL=https://your-domain.com \
+  julianh2o/uneventful:latest
+```

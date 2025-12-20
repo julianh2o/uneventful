@@ -430,6 +430,15 @@ app.post('/api/events', authenticateToken, (req, res) => {
   }
 });
 
+// Health check endpoint for Docker and monitoring
+app.get('/api/health', (_req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  });
+});
+
 // Endpoint to receive client error reports
 app.post('/api/errors', (req, res) => {
   const { message, stack, url, timestamp, type, componentStack } = req.body;
