@@ -77,27 +77,31 @@ try {
 
 const buildDate = new Date().toISOString();
 
-// Build Docker image
-info('Step 1/2: Building Docker image...');
-log(`Building ${imageName}:${version}...`, 'yellow');
+// Ensure buildx builder exists
+info('Setting up Docker buildx...');
+try {
+  execSync('docker buildx inspect multiplatform', { stdio: 'pipe' });
+  info('Using existing buildx builder');
+} catch (err) {
+  info('Creating buildx builder...');
+  exec('docker buildx create --name multiplatform --use');
+}
+
+// Build and push multi-platform Docker image
+info('Step 1/1: Building and pushing multi-platform Docker image...');
+log(`Building ${imageName}:${version} for linux/amd64,linux/arm64...`, 'yellow');
 
 exec(
-  `docker build ` +
+  `docker buildx build ` +
+  `--platform linux/amd64,linux/arm64 ` +
   `--build-arg VERSION=${version} ` +
   `--build-arg BUILD_DATE=${buildDate} ` +
   `--build-arg VCS_REF=${vcsRef} ` +
   `-t ${imageName}:${version} ` +
-  `-t ${imageName}:latest .`
+  `-t ${imageName}:latest ` +
+  `--push .`
 );
-success('Docker image built successfully');
-
-// Push to Docker Hub
-info('\nStep 2/2: Pushing to Docker Hub...');
-log(`Pushing ${imageName}:${version}...`, 'yellow');
-exec(`docker push ${imageName}:${version}`);
-log(`Pushing ${imageName}:latest...`, 'yellow');
-exec(`docker push ${imageName}:latest`);
-success('Images pushed to Docker Hub');
+success('Multi-platform images built and pushed to Docker Hub');
 
 // Summary
 log('\n═══════════════════════════════════════', 'green');

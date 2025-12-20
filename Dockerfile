@@ -1,7 +1,7 @@
 # Multi-stage build for optimized production image
 
 # Stage 1: Build the application
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
@@ -18,14 +18,15 @@ COPY . .
 COPY prisma ./prisma
 COPY prisma.config.ts ./
 
-# Generate Prisma Client
+# Generate Prisma Client (set dummy DATABASE_URL for build)
+ENV DATABASE_URL="file:./data/uneventful.db"
 RUN npx prisma generate
 
 # Build the frontend
 RUN yarn build
 
 # Stage 2: Production image
-FROM node:18-alpine
+FROM node:20-alpine
 
 # Build arguments for version and metadata
 ARG VERSION=unknown
@@ -48,14 +49,17 @@ WORKDIR /app
 COPY package.json yarn.lock ./
 
 # Install production dependencies only
-RUN yarn install --frozen-lockfile --production
+RUN yarn install --frozen-lockfile --production && \
+    yarn cache clean
 
 # Copy Prisma schema, config, and migrations
 COPY prisma ./prisma
 COPY prisma.config.ts ./
 
-# Generate Prisma Client in production
-RUN npx prisma generate
+# Generate Prisma Client in production (set dummy DATABASE_URL for build)
+ENV DATABASE_URL="file:./data/uneventful.db"
+RUN npx prisma generate && \
+    rm -rf /root/.npm /tmp/*
 
 # Copy built frontend from builder stage
 COPY --from=builder /app/build ./build

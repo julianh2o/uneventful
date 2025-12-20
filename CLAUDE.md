@@ -286,7 +286,7 @@ docker run -d \
 
 **Docker Configuration:**
 - Multi-stage build for optimized image size
-- Node.js 18 Alpine base image
+- Node.js 20 Alpine base image
 - Production dependencies only in final image
 - Data directory mounted as volume for persistence
 - Healthcheck endpoint at `/api/health`
@@ -323,9 +323,10 @@ git push && git push --tags
 
 **What the release script does:**
 1. Reads current version from `package.json`
-2. Builds Docker image with version metadata (version, build date, git commit)
-3. Tags image with both specific version (e.g., `julianh2o/uneventful:2.0.1`) and `latest`
-4. Pushes both tags to Docker Hub
+2. Sets up Docker buildx for multi-platform builds
+3. Builds Docker image for both linux/amd64 and linux/arm64 with version metadata (version, build date, git commit)
+4. Tags image with both specific version (e.g., `julianh2o/uneventful:2.0.1`) and `latest`
+5. Pushes both tags to Docker Hub (supports both x86 and ARM servers)
 
 **Docker Hub Repository:**
 - Images are published to `julianh2o/uneventful`
