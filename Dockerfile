@@ -83,4 +83,4 @@ ENV NODE_ENV=production
 ENV APP_VERSION="${VERSION}"
 
 # Start the server (run migrations first)
-CMD ["sh", "-c", "npx prisma migrate deploy && yarn server"]
+CMD ["sh", "-c", "npx prisma migrate deploy && yarn start"]
