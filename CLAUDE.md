@@ -33,8 +33,8 @@ yarn lint                 # Run ESLint
 yarn format              # Format with Prettier
 
 # Deployment
-yarn version --patch     # Bump version (creates git commit and tag)
-yarn release            # Build and push multi-platform Docker image to Docker Hub
+yarn release            # Bump version, push tags, trigger automated GitHub Actions release
+yarn release:local      # Manual: Build and push multi-platform Docker image to Docker Hub
 ```
 
 ## Architecture Overview
@@ -103,10 +103,10 @@ Key types in `src/types/`:
 
 ## Deployment
 
-**IMPORTANT - Release Process: Publishes to Docker Hub**
-1. `yarn version --patch` (or --minor/--major) - Bumps version, creates git commit and tag
-2. `yarn release` - Builds multi-platform image and pushes to `julianh2o/uneventful`
-3. `git push && git push --tags` - Push changes and tags to git
+**IMPORTANT - Release Process: Automated via GitHub Actions**
+1. `yarn release` - Bumps version (patch), creates git commit/tag, pushes to GitHub
+2. GitHub Actions automatically builds multi-platform image and pushes to Docker Hub
+3. **Manual alternative:** `yarn release:local` - Local Docker build and push (use `yarn version` first)
 
 ## API Reference
 

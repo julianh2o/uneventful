@@ -47,7 +47,8 @@
     "prisma:migrate": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
-    "release": "node scripts/release.js"
+    "release": "yarn version --patch && git push && git push --tags",
+    "release:local": "node scripts/release.js"
   },
   "eslintConfig": {
     "extends": [
