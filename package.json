@@ -29,6 +29,7 @@
     "dev:server": "NODE_ENV=development nodemon --watch server --ext ts --exec 'tsx server/index.ts'",
     "build": "react-scripts build",
     "build:server": "tsc --project server/tsconfig.json",
+    "build:local": "bash scripts/build-local.sh",
     "start": "NODE_ENV=production node server/dist/index.js",
     "preview": "yarn build && yarn build:server && yarn start",
     "test": "yarn test:client && yarn test:server",

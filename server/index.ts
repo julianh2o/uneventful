@@ -419,18 +419,26 @@ app.post('/api/errors', (req, res) => {
   res.status(200).json({ received: true });
 });
 
-// Catch-all route to serve React app for client-side routing
+// Serve static files and SPA fallback for client-side routing
 // This must be after all API routes
 if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(path.join(currentDir, '..', 'build')));
+  // When running compiled JS, currentDir is /app/server/dist, so we need to go up twice to reach /app
+  const buildPath = path.join(currentDir, '../..', 'build');
+  console.log('[DEBUG] Build path:', buildPath);
 
-  app.get('*', function (req, res) {
-    res.sendFile(path.join(currentDir, '..', 'build', 'index.html'));
+  app.use(express.static(buildPath));
+
+  // SPA fallback - use middleware instead of route pattern for Express 5 compatibility
+  app.use(function (req, res) {
+    res.sendFile(path.join(buildPath, 'index.html'));
   });
 }
 
 // Start the server
-if (process.argv[1]?.includes('server/index')) {
+// Check for both TypeScript (server/index.ts) and compiled JavaScript (server/dist/index.js) paths
+console.log('[DEBUG] process.argv[1]:', process.argv[1]);
+if (process.argv[1]?.includes('server/index') || process.argv[1]?.includes('server/dist/index')) {
+  console.log('[DEBUG] Starting server...');
   app.listen(PORT, async () => {
     console.log(`Server running on http://localhost:${PORT}`);
 
@@ -445,6 +453,8 @@ if (process.argv[1]?.includes('server/index')) {
 
     startReminderJob();
   });
+} else {
+  console.log('[DEBUG] Not starting server (condition not met)');
 }
 
 export default app;

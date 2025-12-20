@@ -1,9 +1,3 @@
-# Production Docker Compose Configuration
-# Uses pre-built image from Docker Hub
-# This file is standalone - you can copy it anywhere and run it
-
-version: '3.8'
-
 services:
   uneventful:
     image: julianh2o/uneventful:latest
