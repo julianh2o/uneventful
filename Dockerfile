@@ -14,6 +14,13 @@ RUN yarn install --frozen-lockfile
 # Copy source code
 COPY . .
 
+# Copy Prisma schema and config
+COPY prisma ./prisma
+COPY prisma.config.ts ./
+
+# Generate Prisma Client
+RUN npx prisma generate
+
 # Build the frontend
 RUN yarn build
 
@@ -43,6 +50,13 @@ COPY package.json yarn.lock ./
 # Install production dependencies only
 RUN yarn install --frozen-lockfile --production
 
+# Copy Prisma schema, config, and migrations
+COPY prisma ./prisma
+COPY prisma.config.ts ./
+
+# Generate Prisma Client in production
+RUN npx prisma generate
+
 # Copy built frontend from builder stage
 COPY --from=builder /app/build ./build
 
@@ -52,7 +66,7 @@ COPY server ./server
 # Copy config files needed at runtime
 COPY src/config ./src/config
 
-# Create data directory for file-based storage
+# Create data directory for database
 RUN mkdir -p data
 
 # Expose the port (defaults to 2999 but can be overridden with PORT env var)
@@ -64,5 +78,5 @@ ENV NODE_ENV=production
 # Store version info
 ENV APP_VERSION="${VERSION}"
 
-# Start the server
-CMD ["yarn", "server"]
+# Start the server (run migrations first)
+CMD ["sh", "-c", "npx prisma migrate deploy && yarn server"]

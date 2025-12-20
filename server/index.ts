@@ -3,7 +3,6 @@ import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
-import { v4 as uuidv4 } from 'uuid';
 import YAML from 'yaml';
 
 // tsx provides __dirname polyfill in ESM mode
@@ -22,51 +21,25 @@ import {
   createUser,
   findUserById,
   updateUser,
-  initializeUsersFile,
-} from './userStorage';
+} from './repositories/userRepository';
+import {
+  createEvent,
+  findEventById,
+  findEventsByUserId,
+  updateEventData,
+  updateEventTasks,
+} from './repositories/eventRepository';
+import { prisma } from './db';
 import { sendSms } from './sms';
 import { isRateLimited, incrementRateLimit, getRateLimitResetTime } from './rateLimit';
 import { authenticateToken } from './middleware/auth';
 import { isAdmin } from './adminConfig';
-
-const EVENTS_FILE = path.join(currentDir, '..', 'data', 'events.json');
-
-interface Event {
-  id: string;
-  userId: string;
-  data: Record<string, unknown>;
-  createdAt: string;
-  completedTasks?: string[];
-}
-
-const readEvents = (): Event[] => {
-  try {
-    if (!fs.existsSync(EVENTS_FILE)) {
-      return [];
-    }
-    const content = fs.readFileSync(EVENTS_FILE, 'utf8');
-    return JSON.parse(content);
-  } catch {
-    return [];
-  }
-};
-
-const writeEvents = (events: Event[]): void => {
-  const dir = path.dirname(EVENTS_FILE);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  fs.writeFileSync(EVENTS_FILE, JSON.stringify(events, null, 2));
-};
 
 const app = express();
 const PORT = process.env.PORT || 2999;
 
 app.use(cors());
 app.use(express.json());
-
-// Initialize users file
-initializeUsersFile();
 
 // Authentication endpoints
 app.post('/api/auth/request', async (req, res) => {
@@ -90,7 +63,7 @@ app.post('/api/auth/request', async (req, res) => {
       });
     }
 
-    const existingUser = findUserByPhone(normalizedPhone);
+    const existingUser = await findUserByPhone(normalizedPhone);
 
     if (!existingUser) {
       return res.json({
@@ -153,7 +126,7 @@ app.post('/api/auth/register', async (req, res) => {
       });
     }
 
-    const existingUser = findUserByPhone(normalizedPhone);
+    const existingUser = await findUserByPhone(normalizedPhone);
     if (existingUser) {
       return res.status(400).json({
         success: false,
@@ -161,7 +134,7 @@ app.post('/api/auth/register', async (req, res) => {
       });
     }
 
-    const newUser = createUser({
+    const newUser = await createUser({
       name: name.trim(),
       phone: normalizedPhone,
     });
@@ -197,7 +170,7 @@ app.post('/api/auth/register', async (req, res) => {
   }
 });
 
-app.get('/api/auth/verify', (req, res) => {
+app.get('/api/auth/verify', async (req, res) => {
   try {
     const { token } = req.query;
 
@@ -217,7 +190,7 @@ app.get('/api/auth/verify', (req, res) => {
       });
     }
 
-    const user = findUserById(decoded.userId);
+    const user = await findUserById(decoded.userId);
 
     if (!user) {
       return res.status(404).json({
@@ -250,9 +223,9 @@ app.get('/api/auth/verify', (req, res) => {
   }
 });
 
-app.get('/api/auth/me', authenticateToken, (req, res) => {
+app.get('/api/auth/me', authenticateToken, async (req, res) => {
   try {
-    const user = findUserById(req.user!.id);
+    const user = await findUserById(req.user!.id);
 
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
@@ -275,7 +248,7 @@ app.get('/api/auth/me', authenticateToken, (req, res) => {
   }
 });
 
-app.patch('/api/auth/me', authenticateToken, (req, res) => {
+app.patch('/api/auth/me', authenticateToken, async (req, res) => {
   try {
     const { name } = req.body;
 
@@ -283,7 +256,7 @@ app.patch('/api/auth/me', authenticateToken, (req, res) => {
       return res.status(400).json({ error: 'Name is required' });
     }
 
-    const updatedUser = updateUser(req.user!.id, { name: name.trim() });
+    const updatedUser = await updateUser(req.user!.id, { name: name.trim() });
 
     return res.json({
       id: updatedUser.id,
@@ -342,10 +315,9 @@ app.get('/api/tasks', (_req, res) => {
 });
 
 // Endpoint to get all events
-app.get('/api/events', authenticateToken, (req, res) => {
+app.get('/api/events', authenticateToken, async (req, res) => {
   try {
-    const events = readEvents();
-    const userEvents = events.filter((e) => e.userId === req.user!.id);
+    const userEvents = await findEventsByUserId(req.user!.id);
     res.json(userEvents);
   } catch (error) {
     console.error('Error reading events:', error);
@@ -354,10 +326,9 @@ app.get('/api/events', authenticateToken, (req, res) => {
 });
 
 // Endpoint to get a single event by ID
-app.get('/api/events/:id', authenticateToken, (req, res) => {
+app.get('/api/events/:id', authenticateToken, async (req, res) => {
   try {
-    const events = readEvents();
-    const event = events.find((e) => e.id === req.params.id);
+    const event = await findEventById(req.params.id);
     if (!event) {
       return res.status(404).json({ error: 'Event not found' });
     }
@@ -372,18 +343,16 @@ app.get('/api/events/:id', authenticateToken, (req, res) => {
 });
 
 // Endpoint to update an event
-app.put('/api/events/:id', authenticateToken, (req, res) => {
+app.put('/api/events/:id', authenticateToken, async (req, res) => {
   try {
-    const events = readEvents();
-    const eventIndex = events.findIndex((e) => e.id === req.params.id);
-    if (eventIndex === -1) {
+    const event = await findEventById(req.params.id);
+    if (!event) {
       return res.status(404).json({ error: 'Event not found' });
     }
-    if (events[eventIndex].userId !== req.user!.id) {
+    if (event.userId !== req.user!.id) {
       return res.status(403).json({ error: 'Access denied' });
     }
-    events[eventIndex].data = req.body;
-    writeEvents(events);
+    await updateEventData(req.params.id, req.body);
     res.json({ success: true, id: req.params.id });
   } catch (error) {
     console.error('Error updating event:', error);
@@ -392,18 +361,16 @@ app.put('/api/events/:id', authenticateToken, (req, res) => {
 });
 
 // Endpoint to update completed tasks for an event
-app.patch('/api/events/:id/tasks', authenticateToken, (req, res) => {
+app.patch('/api/events/:id/tasks', authenticateToken, async (req, res) => {
   try {
-    const events = readEvents();
-    const eventIndex = events.findIndex((e) => e.id === req.params.id);
-    if (eventIndex === -1) {
+    const event = await findEventById(req.params.id);
+    if (!event) {
       return res.status(404).json({ error: 'Event not found' });
     }
-    if (events[eventIndex].userId !== req.user!.id) {
+    if (event.userId !== req.user!.id) {
       return res.status(403).json({ error: 'Access denied' });
     }
-    events[eventIndex].completedTasks = req.body.completedTasks || [];
-    writeEvents(events);
+    await updateEventTasks(req.params.id, req.body.completedTasks || []);
     res.json({ success: true });
   } catch (error) {
     console.error('Error updating tasks:', error);
@@ -412,17 +379,9 @@ app.patch('/api/events/:id/tasks', authenticateToken, (req, res) => {
 });
 
 // Endpoint to submit an event
-app.post('/api/events', authenticateToken, (req, res) => {
+app.post('/api/events', authenticateToken, async (req, res) => {
   try {
-    const events = readEvents();
-    const newEvent: Event = {
-      id: uuidv4(),
-      userId: req.user!.id,
-      data: req.body,
-      createdAt: new Date().toISOString(),
-    };
-    events.push(newEvent);
-    writeEvents(events);
+    const newEvent = await createEvent(req.user!.id, req.body);
     res.status(201).json({ id: newEvent.id });
   } catch (error) {
     console.error('Error saving event:', error);
@@ -472,8 +431,18 @@ if (process.env.NODE_ENV === 'production') {
 
 // Start the server
 if (process.argv[1]?.includes('server/index')) {
-  app.listen(PORT, () => {
+  app.listen(PORT, async () => {
     console.log(`Server running on http://localhost:${PORT}`);
+
+    // Test database connection
+    try {
+      await prisma.$connect();
+      console.log('Database connected successfully');
+    } catch (error) {
+      console.error('Failed to connect to database:', error);
+      process.exit(1);
+    }
+
     startReminderJob();
   });
 }

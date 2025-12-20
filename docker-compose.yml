@@ -20,6 +20,7 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - APP_BASE_URL=${APP_BASE_URL}
       - NODE_ENV=production
+      - DATABASE_URL=file:./data/uneventful.db
     volumes:
       # Persist data files
       - ./data:/app/data

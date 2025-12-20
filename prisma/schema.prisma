@@ -1,0 +1,40 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id         String   @id @default(uuid())
+  name       String
+  phone      String   @unique
+  email      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  deletedAt  DateTime? // Soft delete
+  isActive   Boolean  @default(true)
+  isAdmin    Boolean  @default(false)
+  isVerified Boolean  @default(true)
+
+  events     Event[]
+
+  @@index([phone])
+  @@index([deletedAt])
+}
+
+model Event {
+  id             String   @id @default(uuid())
+  userId         String
+  data           String   // JSON as TEXT (use JSON.stringify/parse)
+  createdAt      DateTime @default(now())
+  completedTasks String?  // JSON array as TEXT
+
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+}

@@ -3,24 +3,11 @@ import fs from 'fs';
 import path from 'path';
 import YAML from 'yaml';
 import { sendSms } from './sms';
+import { getAllEvents, Event } from './repositories/eventRepository';
 
 // tsx provides __dirname polyfill in ESM mode
 const currentDir = __dirname;
-const EVENTS_FILE = path.join(currentDir, '..', 'data', 'events.json');
 const TASKS_FILE = path.join(currentDir, '..', 'src', 'config', 'tasks.yaml');
-
-interface Event {
-  id: string;
-  data: {
-    eventName?: string;
-    hostName?: string;
-    hostContact?: string;
-    eventDate?: string;
-    [key: string]: unknown;
-  };
-  createdAt: string;
-  completedTasks?: string[];
-}
 
 interface Task {
   id: string;
@@ -32,18 +19,6 @@ interface Task {
 interface TasksConfig {
   tasks: Task[];
 }
-
-const readEvents = (): Event[] => {
-  try {
-    if (!fs.existsSync(EVENTS_FILE)) {
-      return [];
-    }
-    const content = fs.readFileSync(EVENTS_FILE, 'utf8');
-    return JSON.parse(content);
-  } catch {
-    return [];
-  }
-};
 
 const readTasks = (): Task[] => {
   try {
@@ -112,7 +87,7 @@ const formatPhoneNumber = (contact: string): string | null => {
 export const checkAndSendReminders = async (): Promise<void> => {
   console.log(`[${new Date().toISOString()}] Running daily reminder check...`);
 
-  const events = readEvents();
+  const events = await getAllEvents();
   const tasks = readTasks();
   const today = new Date();
 
