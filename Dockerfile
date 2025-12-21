@@ -48,9 +48,9 @@ LABEL org.opencontainers.image.description="Event management application with fo
 LABEL org.opencontainers.image.version="${VERSION}"
 LABEL org.opencontainers.image.created="${BUILD_DATE}"
 LABEL org.opencontainers.image.revision="${VCS_REF}"
-LABEL org.opencontainers.image.authors="Dan Castro <https://www.welcomedeveloper.com>"
-LABEL org.opencontainers.image.url="https://github.com/danilocastronz/weldev-project-react-mui-ts-bp"
-LABEL org.opencontainers.image.source="https://github.com/danilocastronz/weldev-project-react-mui-ts-bp"
+LABEL org.opencontainers.image.authors="Julian Hartline <https://www.julianhartline.com>"
+LABEL org.opencontainers.image.url="https://hub.docker.com/repository/docker/julianh2o/uneventful"
+LABEL org.opencontainers.image.source="https://github.com/julianh2o/uneventful"
 
 # Install OpenSSL for Prisma
 RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
@@ -92,4 +92,4 @@ ENV NODE_ENV=production
 ENV APP_VERSION="${VERSION}"
 
 # Start the server (run migrations first)
-CMD ["sh", "-c", "npx prisma migrate deploy && node build/index.js"]
+CMD ["sh", "-c", "npx prisma migrate deploy && NODE_ENV=production node build/index.js"]
