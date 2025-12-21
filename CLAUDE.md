@@ -34,6 +34,7 @@ yarn lint                 # Run ESLint
 yarn format              # Format with Prettier
 
 # Deployment
+yarn deploy             # Deploy to melinoe server via SSH (requires root access)
 yarn release            # Bump version, push tags, trigger automated GitHub Actions release
 yarn release:local      # Manual: Build and push multi-platform Docker image to Docker Hub
 ```
@@ -104,10 +105,17 @@ Key types in `src/types/`:
 
 ## Deployment
 
+**Production Server Deployment**
+- **Host:** melinoe (root@melinoe)
+- **Location:** `/opt/uneventful`
+- **Command:** `yarn deploy` - SSHs to server, runs `docker compose down/pull/up -d`, then follows logs
+- **Requirements:** SSH access as root to melinoe host
+
 **IMPORTANT - Release Process: Automated via GitHub Actions**
 1. `yarn release` - Bumps version (patch), creates git commit/tag, pushes to GitHub
 2. GitHub Actions automatically builds multi-platform image and pushes to Docker Hub
-3. **Manual alternative:** `yarn release:local` - Local Docker build and push (use `yarn version` first)
+3. `yarn deploy` - Deploy the new image to production server
+4. **Manual alternative:** `yarn release:local` - Local Docker build and push (use `yarn version` first)
 
 ## API Reference
 
