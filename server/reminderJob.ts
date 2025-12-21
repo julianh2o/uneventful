@@ -8,7 +8,12 @@ import { formatSmsMessage } from './smsMessages';
 
 // tsx provides __dirname polyfill in ESM mode
 const currentDir = __dirname;
-const TASKS_FILE = path.join(currentDir, '..', 'src', 'config', 'tasks.yaml');
+// Calculate path based on whether we're running compiled code or source
+// In development: __dirname is .../server, need to go up 1 level
+// In production: __dirname is .../server/dist, need to go up 2 levels
+const isCompiled = currentDir.includes('/dist');
+const levelsUp = isCompiled ? '../..' : '..';
+const TASKS_FILE = path.join(currentDir, levelsUp, 'src', 'config', 'tasks.yaml');
 
 interface Task {
   id: string;

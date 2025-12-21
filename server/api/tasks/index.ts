@@ -7,8 +7,12 @@ const router = Router();
 
 // GET /api/tasks - Get tasks configuration
 router.get('/', (_req, res) => {
-  // When running compiled JS, __dirname is /app/server/dist/api/tasks, so we need to go up to /app
-  const yamlPath = path.join(__dirname, '../../../../src/config', 'tasks.yaml');
+  // Calculate path based on whether we're running compiled code or source
+  // In development: __dirname is .../server/api/tasks, need to go up 3 levels
+  // In production: __dirname is .../server/dist/api/tasks, need to go up 4 levels
+  const isCompiled = __dirname.includes('/dist/');
+  const levelsUp = isCompiled ? '../../../../' : '../../../';
+  const yamlPath = path.join(__dirname, levelsUp, 'src/config', 'tasks.yaml');
 
   try {
     if (!fs.existsSync(yamlPath)) {
