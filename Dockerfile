@@ -59,10 +59,12 @@ RUN yarn install --frozen-lockfile --production && \
 COPY prisma ./prisma
 COPY prisma.config.ts ./
 
-# Generate Prisma Client in production (set dummy DATABASE_URL for build)
+# Copy generated Prisma Client from builder stage
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+
+# Set dummy DATABASE_URL for runtime
 ENV DATABASE_URL="file:./data/uneventful.db"
-RUN npx prisma generate && \
-    rm -rf /root/.npm /tmp/*
 
 # Copy built frontend from builder stage
 COPY --from=builder /app/build ./build
