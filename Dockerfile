@@ -3,6 +3,9 @@
 # Stage 1: Build the application
 FROM node:20-slim AS builder
 
+# Install OpenSSL for Prisma
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Copy package files
@@ -46,6 +49,9 @@ LABEL org.opencontainers.image.authors="Dan Castro <https://www.welcomedeveloper
 LABEL org.opencontainers.image.url="https://github.com/danilocastronz/weldev-project-react-mui-ts-bp"
 LABEL org.opencontainers.image.source="https://github.com/danilocastronz/weldev-project-react-mui-ts-bp"
 
+# Install OpenSSL for Prisma
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Copy package files
@@ -72,8 +78,8 @@ COPY --from=builder /app/build ./build
 # Copy compiled server code (JavaScript, not TypeScript)
 COPY --from=builder /app/server/dist ./server/dist
 
-# Copy config files needed at runtime
-COPY src/config ./src/config
+# Copy config files to build directory for production
+COPY src/config ./build/config
 
 # Create data directory for database
 RUN mkdir -p data

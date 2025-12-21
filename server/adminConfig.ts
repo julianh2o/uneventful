@@ -1,9 +1,8 @@
 import fs from 'fs';
-import path from 'path';
 import YAML from 'yaml';
-import appRoot from 'app-root-path';
+import { getAdminsConfigPath } from './utils/paths';
 
-const ADMINS_FILE = path.join(appRoot.path, 'src', 'config', 'admins.yaml');
+const ADMINS_FILE = getAdminsConfigPath();
 
 interface AdminConfig {
 	admins: Array<{ phone: string }>;

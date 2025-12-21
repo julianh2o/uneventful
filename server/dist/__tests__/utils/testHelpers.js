@@ -69,7 +69,10 @@ exports.getTestDataPath = getTestDataPath;
 const createTestUser = (userData = {}) => {
     return (0, exports.createMockUser)({
         name: userData.name || 'Test User',
-        phone: userData.phone || `+1555${Math.floor(Math.random() * 10000000).toString().padStart(7, '0')}`,
+        phone: userData.phone ||
+            `+1555${Math.floor(Math.random() * 10000000)
+                .toString()
+                .padStart(7, '0')}`,
         ...userData,
     });
 };

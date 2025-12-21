@@ -1,9 +1,8 @@
 import fs from 'fs';
-import path from 'path';
 import YAML from 'yaml';
-import appRoot from 'app-root-path';
+import { getSmsConfigPath } from './utils/paths';
 
-const SMS_CONFIG_FILE = path.join(appRoot.path, 'src', 'config', 'sms.yml');
+const SMS_CONFIG_FILE = getSmsConfigPath();
 
 interface MessageTemplate {
 	template: string;

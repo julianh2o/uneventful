@@ -9,10 +9,11 @@ const adapter = new adapter_libsql_1.PrismaLibSql({
 });
 // Singleton pattern to prevent multiple instances
 const globalForPrisma = global;
-exports.prisma = globalForPrisma.prisma || new client_1.PrismaClient({
-    adapter,
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-});
+exports.prisma = globalForPrisma.prisma ||
+    new client_1.PrismaClient({
+        adapter,
+        log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    });
 if (process.env.NODE_ENV !== 'production') {
     globalForPrisma.prisma = exports.prisma;
 }

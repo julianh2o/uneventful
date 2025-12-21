@@ -1,15 +1,14 @@
 import { Router } from 'express';
 import fs from 'fs';
-import path from 'path';
 import YAML from 'yaml';
-import appRoot from 'app-root-path';
+import { getFormConfigPath } from '../../utils/paths';
 
 const router = Router();
 
 // GET /api/forms/:formName - Get form configuration
 router.get('/:formName', (req, res) => {
 	const { formName } = req.params;
-	const yamlPath = path.join(appRoot.path, 'src/config', `${formName}.yaml`);
+	const yamlPath = getFormConfigPath(formName);
 
 	try {
 		if (!fs.existsSync(yamlPath)) {

@@ -2,10 +2,10 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
-import appRoot from 'app-root-path';
 import { startReminderJob } from './reminderJob';
 import { prisma } from './db';
 import apiRouter from './api';
+import { getBuildPath } from './utils/paths';
 
 const app = express();
 const PORT = process.env.PORT || 2999;
@@ -19,7 +19,7 @@ app.use('/api', apiRouter);
 // Serve static files and SPA fallback for client-side routing
 // This must be after all API routes
 if (process.env.NODE_ENV === 'production') {
-	const buildPath = path.join(appRoot.path, 'build');
+	const buildPath = getBuildPath();
 	console.log('[DEBUG] Build path:', buildPath);
 
 	app.use(express.static(buildPath));

@@ -1,13 +1,12 @@
 import cron from 'node-cron';
 import fs from 'fs';
-import path from 'path';
 import YAML from 'yaml';
-import appRoot from 'app-root-path';
 import { sendSms } from './sms';
 import { getAllEvents, Event } from './repositories/eventRepository';
 import { formatSmsMessage } from './smsMessages';
+import { getTasksConfigPath } from './utils/paths';
 
-const TASKS_FILE = path.join(appRoot.path, 'src', 'config', 'tasks.yaml');
+const TASKS_FILE = getTasksConfigPath();
 
 interface Task {
 	id: string;

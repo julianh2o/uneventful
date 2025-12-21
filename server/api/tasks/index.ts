@@ -1,14 +1,13 @@
 import { Router } from 'express';
 import fs from 'fs';
-import path from 'path';
 import YAML from 'yaml';
-import appRoot from 'app-root-path';
+import { getTasksConfigPath } from '../../utils/paths';
 
 const router = Router();
 
 // GET /api/tasks - Get tasks configuration
 router.get('/', (_req, res) => {
-	const yamlPath = path.join(appRoot.path, 'src/config', 'tasks.yaml');
+	const yamlPath = getTasksConfigPath();
 
 	try {
 		if (!fs.existsSync(yamlPath)) {

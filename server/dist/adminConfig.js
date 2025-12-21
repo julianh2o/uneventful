@@ -5,10 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.isAdmin = void 0;
 const fs_1 = __importDefault(require("fs"));
-const path_1 = __importDefault(require("path"));
 const yaml_1 = __importDefault(require("yaml"));
-const app_root_path_1 = __importDefault(require("app-root-path"));
-const ADMINS_FILE = path_1.default.join(app_root_path_1.default.path, 'src', 'config', 'admins.yaml');
+const paths_1 = require("./utils/paths");
+const ADMINS_FILE = (0, paths_1.getAdminsConfigPath)();
 let cachedAdmins = null;
 let lastModified = null;
 const loadAdminConfig = () => {

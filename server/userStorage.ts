@@ -1,9 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import { v4 as uuidv4 } from 'uuid';
-import appRoot from 'app-root-path';
+import { getUsersFilePath } from './utils/paths';
 
-const USERS_FILE = path.join(appRoot.path, 'data', 'users.json');
+const USERS_FILE = getUsersFilePath();
 
 export interface StoredUser {
 	id: string;

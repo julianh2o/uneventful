@@ -6,13 +6,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.startReminderJob = exports.checkAndSendReminders = void 0;
 const node_cron_1 = __importDefault(require("node-cron"));
 const fs_1 = __importDefault(require("fs"));
-const path_1 = __importDefault(require("path"));
 const yaml_1 = __importDefault(require("yaml"));
-const app_root_path_1 = __importDefault(require("app-root-path"));
 const sms_1 = require("./sms");
 const eventRepository_1 = require("./repositories/eventRepository");
 const smsMessages_1 = require("./smsMessages");
-const TASKS_FILE = path_1.default.join(app_root_path_1.default.path, 'src', 'config', 'tasks.yaml');
+const paths_1 = require("./utils/paths");
+const TASKS_FILE = (0, paths_1.getTasksConfigPath)();
 const readTasks = () => {
     try {
         if (!fs_1.default.existsSync(TASKS_FILE)) {
@@ -53,7 +52,7 @@ const getTasksDueToday = (event, tasks, today) => {
         return [];
     const daysUntilEvent = getDaysDifference(eventDate, today);
     const completedTasks = event.completedTasks || [];
-    return tasks.filter(task => {
+    return tasks.filter((task) => {
         if (completedTasks.includes(task.id))
             return false;
         return task.deadline === daysUntilEvent;
@@ -92,7 +91,7 @@ const checkAndSendReminders = async () => {
             console.log(`Contact "${hostContact}" doesn't appear to be a phone number, skipping...`);
             continue;
         }
-        const taskNames = dueTasks.map(t => t.name).join(', ');
+        const taskNames = dueTasks.map((t) => t.name).join(', ');
         const message = (0, smsMessages_1.formatSmsMessage)('taskReminder', {
             hostName,
             eventName,

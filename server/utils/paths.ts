@@ -1,0 +1,67 @@
+import path from 'path';
+import appRoot from 'app-root-path';
+
+/**
+ * Centralized path resolution utility for the server
+ * All paths are resolved relative to the application root
+ */
+
+/**
+ * Get the base config directory path
+ * In development: /src/config
+ * In production: /build/config
+ */
+export const getConfigPath = (): string => {
+	const isProduction = process.env.NODE_ENV === 'production';
+	return path.join(appRoot.path, isProduction ? 'build' : 'src', 'config');
+};
+
+/**
+ * Get the path to the SMS configuration file
+ */
+export const getSmsConfigPath = (): string => {
+	return path.join(getConfigPath(), 'sms.yml');
+};
+
+/**
+ * Get the path to the tasks configuration file
+ */
+export const getTasksConfigPath = (): string => {
+	return path.join(getConfigPath(), 'tasks.yaml');
+};
+
+/**
+ * Get the path to the admins configuration file
+ */
+export const getAdminsConfigPath = (): string => {
+	return path.join(getConfigPath(), 'admins.yaml');
+};
+
+/**
+ * Get the path to a specific form configuration file
+ * @param formName - The name of the form (e.g., 'eventForm')
+ */
+export const getFormConfigPath = (formName: string): string => {
+	return path.join(getConfigPath(), `${formName}.yaml`);
+};
+
+/**
+ * Get the path to the users data file
+ */
+export const getUsersFilePath = (): string => {
+	return path.join(appRoot.path, 'data', 'users.json');
+};
+
+/**
+ * Get the path to the frontend build directory
+ */
+export const getBuildPath = (): string => {
+	return path.join(appRoot.path, 'build');
+};
+
+/**
+ * Get the path to the data directory
+ */
+export const getDataPath = (): string => {
+	return path.join(appRoot.path, 'data');
+};

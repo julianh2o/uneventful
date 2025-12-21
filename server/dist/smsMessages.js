@@ -5,10 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.reloadSmsConfig = exports.getMessageVariables = exports.formatSmsMessage = void 0;
 const fs_1 = __importDefault(require("fs"));
-const path_1 = __importDefault(require("path"));
 const yaml_1 = __importDefault(require("yaml"));
-const app_root_path_1 = __importDefault(require("app-root-path"));
-const SMS_CONFIG_FILE = path_1.default.join(app_root_path_1.default.path, 'src', 'config', 'sms.yml');
+const paths_1 = require("./utils/paths");
+const SMS_CONFIG_FILE = (0, paths_1.getSmsConfigPath)();
 let cachedConfig = null;
 const loadSmsConfig = () => {
     if (cachedConfig) {

@@ -7,8 +7,8 @@ exports.normalizePhoneNumber = exports.updateUser = exports.createUser = exports
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const uuid_1 = require("uuid");
-const app_root_path_1 = __importDefault(require("app-root-path"));
-const USERS_FILE = path_1.default.join(app_root_path_1.default.path, 'data', 'users.json');
+const paths_1 = require("./utils/paths");
+const USERS_FILE = (0, paths_1.getUsersFilePath)();
 const initializeUsersFile = () => {
     const dir = path_1.default.dirname(USERS_FILE);
     if (!fs_1.default.existsSync(dir)) {

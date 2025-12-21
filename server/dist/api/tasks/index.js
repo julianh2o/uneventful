@@ -5,13 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const fs_1 = __importDefault(require("fs"));
-const path_1 = __importDefault(require("path"));
 const yaml_1 = __importDefault(require("yaml"));
-const app_root_path_1 = __importDefault(require("app-root-path"));
+const paths_1 = require("../../utils/paths");
 const router = (0, express_1.Router)();
 // GET /api/tasks - Get tasks configuration
 router.get('/', (_req, res) => {
-    const yamlPath = path_1.default.join(app_root_path_1.default.path, 'src/config', 'tasks.yaml');
+    const yamlPath = (0, paths_1.getTasksConfigPath)();
     try {
         if (!fs_1.default.existsSync(yamlPath)) {
             return res.status(404).json({ error: 'Tasks configuration not found' });

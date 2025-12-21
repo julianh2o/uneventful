@@ -21,12 +21,7 @@ exports.default = (0, config_1.defineConfig)({
         coverage: {
             provider: 'v8',
             reporter: ['text', 'json', 'html'],
-            exclude: [
-                'node_modules/',
-                '**/*.test.ts',
-                'test-setup.ts',
-                '__tests__/utils/testHelpers.ts',
-            ],
+            exclude: ['node_modules/', '**/*.test.ts', 'test-setup.ts', '__tests__/utils/testHelpers.ts'],
         },
     },
 });
