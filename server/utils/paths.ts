@@ -53,10 +53,13 @@ export const getUsersFilePath = (): string => {
 };
 
 /**
- * Get the path to the frontend build directory
+ * Get the path to the frontend build directory (static files)
+ * In development: /build (doesn't exist in dev, but included for consistency)
+ * In production: /build/public
  */
 export const getBuildPath = (): string => {
-	return path.join(appRoot.path, 'build');
+	const isProduction = process.env.NODE_ENV === 'production';
+	return path.join(appRoot.path, 'build', isProduction ? 'public' : '');
 };
 
 /**

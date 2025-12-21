@@ -25,11 +25,14 @@ COPY prisma.config.ts ./
 ENV DATABASE_URL="file:./data/uneventful.db"
 RUN npx prisma generate
 
-# Build the frontend
+# Build the server first (compile TypeScript to JavaScript -> build/)
+RUN yarn build:server
+
+# Build the frontend (outputs to build/public/)
 RUN yarn build
 
-# Build the server (compile TypeScript to JavaScript)
-RUN yarn build:server
+# Copy config files to build directory
+RUN cp -r src/config build/config
 
 # Stage 2: Production image
 FROM node:20-slim
@@ -72,14 +75,9 @@ COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 # Set dummy DATABASE_URL for runtime
 ENV DATABASE_URL="file:./data/uneventful.db"
 
-# Copy built frontend from builder stage
+# Copy entire build directory from builder stage
+# This contains: compiled server code, frontend (in public/), and config files
 COPY --from=builder /app/build ./build
-
-# Copy compiled server code (JavaScript, not TypeScript)
-COPY --from=builder /app/server/dist ./server/dist
-
-# Copy config files to build directory for production
-COPY src/config ./build/config
 
 # Create data directory for database
 RUN mkdir -p data
@@ -94,4 +92,4 @@ ENV NODE_ENV=production
 ENV APP_VERSION="${VERSION}"
 
 # Start the server (run migrations first)
-CMD ["sh", "-c", "npx prisma migrate deploy && yarn start"]
+CMD ["sh", "-c", "npx prisma migrate deploy && node build/index.js"]
