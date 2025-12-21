@@ -29,7 +29,7 @@
     "dev:client": "PORT=2998 react-scripts start",
     "dev:server": "NODE_ENV=development nodemon --watch server --ext ts --exec 'tsx server/index.ts'",
     "build": "BUILD_PATH=build/public react-scripts build",
-    "build:server": "tsc --project server/tsconfig.json",
+    "build:server": "tsc --project server/tsconfig.json && mkdir -p build && cp -r src/config build/",
     "build:local": "bash scripts/build-local.sh",
     "start": "NODE_ENV=production node build/index.js",
     "preview": "yarn build:server && yarn build && yarn start",

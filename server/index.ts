@@ -31,9 +31,9 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 // Start the server
-// Check for both TypeScript (server/index.ts) and compiled JavaScript (server/dist/index.js) paths
+// Check for TypeScript (server/index.ts), old compiled (server/dist/index.js), or new compiled (build/index.js) paths
 console.log('[DEBUG] process.argv[1]:', process.argv[1]);
-if (process.argv[1]?.includes('server/index') || process.argv[1]?.includes('server/dist/index')) {
+if (process.argv[1]?.includes('server/index') || process.argv[1]?.includes('server/dist/index') || process.argv[1]?.includes('build/index')) {
 	console.log('[DEBUG] Starting server...');
 	app.listen(PORT, async () => {
 		console.log(`Server running on http://localhost:${PORT}`);
