@@ -18,8 +18,7 @@ export const SignOutRoute = () => {
 				bottom: 0;
 				width: 100%;
 			`}
-			onClick={handleSignOutClick}
-		>
+			onClick={handleSignOutClick}>
 			<ListItemIcon>
 				<IconButton size='small'>
 					<ExitToApp />

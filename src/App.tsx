@@ -27,7 +27,7 @@ function App() {
 				setMode((prevMode) => (prevMode === LIGHT_MODE_THEME ? DARK_MODE_THEME : LIGHT_MODE_THEME));
 			},
 		}),
-		[]
+		[],
 	);
 
 	const theme = useMemo(() => getAppTheme(mode), [mode]);
@@ -35,7 +35,17 @@ function App() {
 	const addRoute = (route: AppRoute) => {
 		const Component = route.component;
 		if (!Component) return null;
-		return <Route key={route.key} path={route.path} element={<ProtectedRoute><Component /></ProtectedRoute>} />;
+		return (
+			<Route
+				key={route.key}
+				path={route.path}
+				element={
+					<ProtectedRoute>
+						<Component />
+					</ProtectedRoute>
+				}
+			/>
+		);
 	};
 
 	return (
@@ -49,19 +59,50 @@ function App() {
 								<Route path='/login' element={<Login />} />
 								<Route path='/auth/verify' element={<AuthVerify />} />
 
-								<Route path='/*' element={
-									<Layout>
-										<Routes>
-											<Route path='/register' element={<ProtectedRoute><EventRegistration /></ProtectedRoute>} />
-											<Route path='/event/:id/task/:taskId' element={<ProtectedRoute><TaskDetail /></ProtectedRoute>} />
-											<Route path='/event/:id/edit' element={<ProtectedRoute><EventRegistration editMode /></ProtectedRoute>} />
-											<Route path='/event/:id' element={<ProtectedRoute><EventDashboard /></ProtectedRoute>} />
-											{routes.map((route: AppRoute) =>
-												route.subRoutes ? route.subRoutes.map((item: AppRoute) => addRoute(item)) : addRoute(route)
-											)}
-										</Routes>
-									</Layout>
-								} />
+								<Route
+									path='/*'
+									element={
+										<Layout>
+											<Routes>
+												<Route
+													path='/register'
+													element={
+														<ProtectedRoute>
+															<EventRegistration />
+														</ProtectedRoute>
+													}
+												/>
+												<Route
+													path='/event/:id/task/:taskId'
+													element={
+														<ProtectedRoute>
+															<TaskDetail />
+														</ProtectedRoute>
+													}
+												/>
+												<Route
+													path='/event/:id/edit'
+													element={
+														<ProtectedRoute>
+															<EventRegistration editMode />
+														</ProtectedRoute>
+													}
+												/>
+												<Route
+													path='/event/:id'
+													element={
+														<ProtectedRoute>
+															<EventDashboard />
+														</ProtectedRoute>
+													}
+												/>
+												{routes.map((route: AppRoute) =>
+													route.subRoutes ? route.subRoutes.map((item: AppRoute) => addRoute(item)) : addRoute(route),
+												)}
+											</Routes>
+										</Layout>
+									}
+								/>
 							</Routes>
 						</AuthProvider>
 					</ErrorBoundary>

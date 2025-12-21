@@ -8,11 +8,11 @@ const node_cron_1 = __importDefault(require("node-cron"));
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const yaml_1 = __importDefault(require("yaml"));
+const app_root_path_1 = __importDefault(require("app-root-path"));
 const sms_1 = require("./sms");
 const eventRepository_1 = require("./repositories/eventRepository");
-// tsx provides __dirname polyfill in ESM mode
-const currentDir = __dirname;
-const TASKS_FILE = path_1.default.join(currentDir, '..', 'src', 'config', 'tasks.yaml');
+const smsMessages_1 = require("./smsMessages");
+const TASKS_FILE = path_1.default.join(app_root_path_1.default.path, 'src', 'config', 'tasks.yaml');
 const readTasks = () => {
     try {
         if (!fs_1.default.existsSync(TASKS_FILE)) {
@@ -93,7 +93,11 @@ const checkAndSendReminders = async () => {
             continue;
         }
         const taskNames = dueTasks.map(t => t.name).join(', ');
-        const message = `Hi ${hostName}! Reminder: The following tasks for "${eventName}" are due today: ${taskNames}. - uneventful`;
+        const message = (0, smsMessages_1.formatSmsMessage)('taskReminder', {
+            hostName,
+            eventName,
+            taskNames,
+        });
         console.log(`Sending reminder to ${phoneNumber} for tasks: ${taskNames}`);
         const result = await (0, sms_1.sendSms)({ to: phoneNumber, message });
         if (result.success) {

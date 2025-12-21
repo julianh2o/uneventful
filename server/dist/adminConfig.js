@@ -7,9 +7,8 @@ exports.isAdmin = void 0;
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const yaml_1 = __importDefault(require("yaml"));
-// tsx provides __dirname polyfill in ESM mode
-const currentDir = __dirname;
-const ADMINS_FILE = path_1.default.join(currentDir, '..', 'src', 'config', 'admins.yaml');
+const app_root_path_1 = __importDefault(require("app-root-path"));
+const ADMINS_FILE = path_1.default.join(app_root_path_1.default.path, 'src', 'config', 'admins.yaml');
 let cachedAdmins = null;
 let lastModified = null;
 const loadAdminConfig = () => {

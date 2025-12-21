@@ -21,14 +21,12 @@ export const Layout: FC<LayoutProps> = ({ children }) => {
 		<div
 			css={css`
 				min-height: 100vh;
-			`}
-		>
+			`}>
 			<div
 				css={css`
 					display: flex;
 					min-height: calc(100vh - ${FOOTER_HEIGHT}px);
-				`}
-			>
+				`}>
 				<Box component='header'>
 					<Header toggleNavigation={toggleNavigation} />
 				</Box>

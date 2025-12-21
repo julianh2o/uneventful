@@ -9,8 +9,7 @@ export const PageTitle = ({ title }: { title: string }) => (
 		`}
 		variant='h2'
 		component='h3'
-		color='textSecondary'
-	>
+		color='textSecondary'>
 		{title}
 	</Typography>
 );

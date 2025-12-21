@@ -12,16 +12,14 @@ window.onerror = (
 	_source?: string,
 	_lineno?: number,
 	_colno?: number,
-	error?: Error
+	error?: Error,
 ): boolean => {
 	reportError(error || String(message), 'runtime');
 	return false;
 };
 
 window.addEventListener('unhandledrejection', (event: PromiseRejectionEvent) => {
-	const error = event.reason instanceof Error
-		? event.reason
-		: new Error(String(event.reason));
+	const error = event.reason instanceof Error ? event.reason : new Error(String(event.reason));
 	reportError(error, 'runtime');
 });
 
@@ -40,5 +38,5 @@ root.render(
 			</Helmet>
 			<App />
 		</HelmetProvider>
-	</React.StrictMode>
+	</React.StrictMode>,
 );

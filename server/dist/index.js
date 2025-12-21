@@ -7,8 +7,7 @@ require("dotenv/config");
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const path_1 = __importDefault(require("path"));
-// tsx provides __dirname polyfill in ESM mode
-const currentDir = __dirname;
+const app_root_path_1 = __importDefault(require("app-root-path"));
 const reminderJob_1 = require("./reminderJob");
 const db_1 = require("./db");
 const api_1 = __importDefault(require("./api"));
@@ -21,8 +20,7 @@ app.use('/api', api_1.default);
 // Serve static files and SPA fallback for client-side routing
 // This must be after all API routes
 if (process.env.NODE_ENV === 'production') {
-    // When running compiled JS, currentDir is /app/server/dist, so we need to go up twice to reach /app
-    const buildPath = path_1.default.join(currentDir, '../..', 'build');
+    const buildPath = path_1.default.join(app_root_path_1.default.path, 'build');
     console.log('[DEBUG] Build path:', buildPath);
     app.use(express_1.default.static(buildPath));
     // SPA fallback - use middleware instead of route pattern for Express 5 compatibility

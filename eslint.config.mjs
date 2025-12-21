@@ -41,7 +41,10 @@ export default [
         HTMLAnchorElement: 'readonly',
         Response: 'readonly',
         PromiseRejectionEvent: 'readonly',
+        Location: 'readonly',
+        Storage: 'readonly',
         // Node globals
+        global: 'readonly',
         process: 'readonly',
         __dirname: 'readonly',
         __filename: 'readonly',

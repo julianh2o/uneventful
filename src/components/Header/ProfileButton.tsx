@@ -6,32 +6,30 @@ import { AccountCircle as AccountCircleIcon } from '@mui/icons-material';
 import { useAuth } from '../../hooks/useAuth';
 
 export const ProfileButton = () => {
-  const { user } = useAuth();
-  const navigate = useNavigate();
+	const { user } = useAuth();
+	const navigate = useNavigate();
 
-  const handleClick = () => {
-    navigate('/profile');
-  };
+	const handleClick = () => {
+		navigate('/profile');
+	};
 
-  return (
-    <Tooltip title="Profile" placement="bottom" arrow>
-      <IconButton
-        size="large"
-        color="inherit"
-        onClick={handleClick}
-        sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
-      >
-        <AccountCircleIcon />
-        <Typography
-          variant="body2"
-          sx={{
-            display: { xs: 'none', md: 'block' },
-            textTransform: 'none',
-          }}
-        >
-          {user?.name || 'User'}
-        </Typography>
-      </IconButton>
-    </Tooltip>
-  );
+	return (
+		<Tooltip title='Profile' placement='bottom' arrow>
+			<IconButton
+				size='large'
+				color='inherit'
+				onClick={handleClick}
+				sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+				<AccountCircleIcon />
+				<Typography
+					variant='body2'
+					sx={{
+						display: { xs: 'none', md: 'block' },
+						textTransform: 'none',
+					}}>
+					{user?.name || 'User'}
+				</Typography>
+			</IconButton>
+		</Tooltip>
+	);
 };

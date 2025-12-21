@@ -1,7 +1,4 @@
-import {
-	Event as EventIcon,
-	AccountCircle as AccountCircleIcon,
-} from '@mui/icons-material';
+import { Event as EventIcon, AccountCircle as AccountCircleIcon } from '@mui/icons-material';
 
 import { Home } from '../pages/Home';
 import { Profile } from '../pages/Profile';

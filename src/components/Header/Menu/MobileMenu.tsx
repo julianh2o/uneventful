@@ -44,8 +44,7 @@ export const MobileMenu = ({ isMenuOpen, handleMenuOpen, handleMenuClose, anchor
 				horizontal: 'right',
 			}}
 			open={isMenuOpen}
-			onClose={handleMenuClose}
-		>
+			onClose={handleMenuClose}>
 			<Box sx={{ textAlign: 'center' }}>
 				<MenuItem onClick={handleProfileClick}>
 					<AccountCircleIcon sx={{ mr: 1 }} />

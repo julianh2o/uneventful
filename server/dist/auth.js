@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.formatMagicLinkSms = exports.generateMagicLinkUrl = exports.verifySessionToken = exports.verifyMagicLinkToken = exports.generateSessionToken = exports.generateMagicLinkToken = void 0;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const smsMessages_1 = require("./smsMessages");
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 const MAGIC_LINK_EXPIRY = '15m';
 const SESSION_EXPIRY = '30d';
@@ -61,9 +62,9 @@ const generateMagicLinkUrl = (token) => {
 };
 exports.generateMagicLinkUrl = generateMagicLinkUrl;
 const formatMagicLinkSms = (name, magicLinkUrl) => {
-    const greeting = name ? `Hi ${name}!` : 'Hi!';
-    return `${greeting} Click here to sign in to uneventful: ${magicLinkUrl}
-
-This link expires in 15 minutes.`;
+    return (0, smsMessages_1.formatSmsMessage)('magicLink', {
+        name,
+        magicLinkUrl,
+    });
 };
 exports.formatMagicLinkSms = formatMagicLinkSms;

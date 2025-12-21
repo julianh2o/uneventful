@@ -7,12 +7,12 @@ dotenv.config({ path: path.join(__dirname, '.env.test') });
 
 // Mock Twilio to avoid sending real SMS in tests
 vi.mock('twilio', () => ({
-  default: vi.fn(() => ({
-    messages: {
-      create: vi.fn().mockResolvedValue({
-        sid: 'test_message_sid',
-        status: 'sent',
-      }),
-    },
-  })),
+	default: vi.fn(() => ({
+		messages: {
+			create: vi.fn().mockResolvedValue({
+				sid: 'test_message_sid',
+				status: 'sent',
+			}),
+		},
+	})),
 }));

@@ -14,16 +14,14 @@ export const Footer = () => {
 				justify-content: center;
 				background: ${theme.palette.background.paper};
 				min-height: ${FOOTER_HEIGHT};
-			`}
-		>
+			`}>
 			<Typography
 				css={css`
 					word-spacing: 0.1rem;
 					text-transform: uppercase;
 				`}
 				variant='caption'
-				color='textSecondary'
-			>
+				color='textSecondary'>
 				{FOOTER_TEXT}
 			</Typography>
 		</div>

@@ -7,12 +7,12 @@ const express_1 = require("express");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const yaml_1 = __importDefault(require("yaml"));
+const app_root_path_1 = __importDefault(require("app-root-path"));
 const router = (0, express_1.Router)();
 // GET /api/forms/:formName - Get form configuration
 router.get('/:formName', (req, res) => {
     const { formName } = req.params;
-    // When running compiled JS, __dirname is /app/server/dist/api/forms, so we need to go up to /app
-    const yamlPath = path_1.default.join(__dirname, '../../../../src/config', `${formName}.yaml`);
+    const yamlPath = path_1.default.join(app_root_path_1.default.path, 'src/config', `${formName}.yaml`);
     try {
         if (!fs_1.default.existsSync(yamlPath)) {
             return res.status(404).json({ error: `Form configuration '${formName}' not found` });

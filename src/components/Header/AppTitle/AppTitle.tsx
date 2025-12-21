@@ -11,8 +11,7 @@ export const AppTitle = () => (
 		css={css`
 			text-decoration: none;
 			color: inherit;
-		`}
-	>
+		`}>
 		<Typography
 			variant='h6'
 			noWrap
@@ -22,8 +21,7 @@ export const AppTitle = () => (
 					sm: block;
 				}
 				cursor: pointer;
-			`}
-		>
+			`}>
 			{APP_TITLE}
 		</Typography>
 	</NavLink>
