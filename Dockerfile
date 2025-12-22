@@ -9,7 +9,7 @@ RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists
 WORKDIR /app
 
 # Copy package files
-COPY package.json yarn.lock ./
+COPY package.json yarn.lock .yarnrc ./
 
 # Install dependencies
 RUN yarn install --frozen-lockfile
@@ -58,7 +58,7 @@ RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists
 WORKDIR /app
 
 # Copy package files
-COPY package.json yarn.lock ./
+COPY package.json yarn.lock .yarnrc ./
 
 # Install production dependencies only
 RUN yarn install --frozen-lockfile --production && \
