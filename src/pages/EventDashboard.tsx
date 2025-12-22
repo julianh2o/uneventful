@@ -39,6 +39,7 @@ import { useEvent } from '../hooks/useEvent';
 import { useTasks, Task } from '../hooks/useTasks';
 import { useEventCountdown } from '../hooks/useEventCountdown';
 import { CatBat } from '../components/CatBat';
+import { NotificationToggle } from '../components/NotificationToggle';
 
 const parseEventDate = (dateStr?: string, timeStr?: string): Date | null => {
 	if (!dateStr) return null;
@@ -246,23 +247,23 @@ export const EventDashboard = () => {
 						textAlign: 'center',
 						position: 'relative',
 					}}>
-					<Button
-						variant='outlined'
-						startIcon={<EditIcon />}
-						onClick={() => navigate(`/event/${id}/edit`)}
-						sx={{
-							position: 'absolute',
-							top: 16,
-							right: 16,
-							color: 'white',
-							borderColor: 'rgba(255,255,255,0.5)',
-							'&:hover': {
-								borderColor: 'white',
-								bgcolor: 'rgba(255,255,255,0.1)',
-							},
-						}}>
-						Edit
-					</Button>
+					<Box sx={{ position: 'absolute', top: 16, right: 16, display: 'flex', gap: 1 }}>
+						<NotificationToggle eventId={id} color='inherit' />
+						<Button
+							variant='outlined'
+							startIcon={<EditIcon />}
+							onClick={() => navigate(`/event/${id}/edit`)}
+							sx={{
+								color: 'white',
+								borderColor: 'rgba(255,255,255,0.5)',
+								'&:hover': {
+									borderColor: 'white',
+									bgcolor: 'rgba(255,255,255,0.1)',
+								},
+							}}>
+							Edit
+						</Button>
+					</Box>
 					<EventIcon sx={{ fontSize: 48, mb: 2, opacity: 0.9 }} />
 					<Typography variant='h3' fontWeight='bold' gutterBottom>
 						{data.eventName || 'Unnamed Event'}

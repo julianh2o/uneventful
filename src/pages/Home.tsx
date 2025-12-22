@@ -17,6 +17,7 @@ import { Add as AddIcon } from '@mui/icons-material';
 
 import { APP_TITLE, PAGE_TITLE_HOME } from '../utils/constants';
 import { apiClient } from '../utils/apiClient';
+import { NotificationToggle } from '../components/NotificationToggle';
 
 interface Event {
 	id: string;
@@ -93,10 +94,27 @@ export const Home = () => {
 					{PAGE_TITLE_HOME} | {APP_TITLE}
 				</title>
 			</Helmet>
-			<Box sx={{ p: 2 }}>
-				<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-					<Typography variant='h4'>My Events</Typography>
-					<Button component={Link} to='/register' variant='contained' color='primary' startIcon={<AddIcon />}>
+			<Box>
+				<Box
+					sx={{
+						display: 'flex',
+						justifyContent: 'space-between',
+						alignItems: 'center',
+						mb: 3,
+						p: 3,
+						borderRadius: 3,
+						background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+					}}>
+					<Typography variant='h4' sx={{ fontWeight: 700 }}>
+						My Events
+					</Typography>
+					<Button
+						component={Link}
+						to='/register'
+						variant='contained'
+						color='primary'
+						startIcon={<AddIcon />}
+						size='large'>
 						Create Event
 					</Button>
 				</Box>
@@ -119,7 +137,10 @@ export const Home = () => {
 									.join(' • ');
 
 								return (
-									<ListItem key={event.id} disablePadding>
+									<ListItem
+										key={event.id}
+										disablePadding
+										secondaryAction={<NotificationToggle eventId={event.id} size='small' />}>
 										<ListItemButton component={Link} to={`/event/${event.id}`}>
 											<ListItemText primary={event.data.eventName || 'Unnamed Event'} secondary={secondaryText} />
 										</ListItemButton>

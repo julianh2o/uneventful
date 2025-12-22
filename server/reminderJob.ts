@@ -5,6 +5,7 @@ import { sendSms } from './sms';
 import { getAllEvents, Event } from './repositories/eventRepository';
 import { formatSmsMessage } from './smsMessages';
 import { getTasksConfigPath } from './utils/paths';
+import { prisma } from './db';
 
 const TASKS_FILE = getTasksConfigPath();
 
@@ -83,6 +84,17 @@ const formatPhoneNumber = (contact: string): string | null => {
 	return null;
 };
 
+interface EventReminder {
+	eventName: string;
+	tasks: string[];
+}
+
+interface UserReminders {
+	phoneNumber: string;
+	hostName: string;
+	events: EventReminder[];
+}
+
 export const checkAndSendReminders = async (): Promise<void> => {
 	console.log(`[${new Date().toISOString()}] Running daily reminder check...`);
 
@@ -90,10 +102,28 @@ export const checkAndSendReminders = async (): Promise<void> => {
 	const tasks = readTasks();
 	const today = new Date();
 
+	// Group reminders by phone number
+	const remindersByPhone = new Map<string, UserReminders>();
+
 	for (const event of events) {
 		const dueTasks = getTasksDueToday(event, tasks, today);
 
 		if (dueTasks.length === 0) continue;
+
+		// Check if the user is subscribed to reminders for this event
+		const subscription = await prisma.eventSubscription.findUnique({
+			where: {
+				userId_eventId: {
+					userId: event.userId,
+					eventId: event.id,
+				},
+			},
+		});
+
+		if (!subscription) {
+			console.log(`User not subscribed to event ${event.id}, skipping...`);
+			continue;
+		}
 
 		const hostContact = event.data.hostContact as string | undefined;
 		const hostName = (event.data.hostName as string | undefined) || 'Host';
@@ -110,14 +140,38 @@ export const checkAndSendReminders = async (): Promise<void> => {
 			continue;
 		}
 
-		const taskNames = dueTasks.map((t) => t.name).join(', ');
-		const message = formatSmsMessage('taskReminder', {
-			hostName,
+		// Add to the map, grouping by phone number
+		if (!remindersByPhone.has(phoneNumber)) {
+			remindersByPhone.set(phoneNumber, {
+				phoneNumber,
+				hostName,
+				events: [],
+			});
+		}
+
+		const userReminders = remindersByPhone.get(phoneNumber)!;
+		userReminders.events.push({
 			eventName,
-			taskNames,
+			tasks: dueTasks.map((t) => t.name),
+		});
+	}
+
+	// Send one SMS per phone number with all their reminders
+	for (const [phoneNumber, userReminders] of remindersByPhone) {
+		// Build consolidated message
+		let message = `Hi ${userReminders.hostName}! Task reminders:\n\n`;
+
+		userReminders.events.forEach((eventReminder) => {
+			message += `${eventReminder.eventName}:\n`;
+			eventReminder.tasks.forEach((taskName) => {
+				message += `  - ${taskName}\n`;
+			});
+			message += '\n';
 		});
 
-		console.log(`Sending reminder to ${phoneNumber} for tasks: ${taskNames}`);
+		message += 'Manage your events at uneventful.bawdyshop.space';
+
+		console.log(`Sending consolidated reminder to ${phoneNumber} for ${userReminders.events.length} event(s)`);
 		const result = await sendSms({ to: phoneNumber, message });
 
 		if (result.success) {
@@ -127,7 +181,7 @@ export const checkAndSendReminders = async (): Promise<void> => {
 		}
 	}
 
-	console.log(`[${new Date().toISOString()}] Reminder check complete.`);
+	console.log(`[${new Date().toISOString()}] Reminder check complete. Sent ${remindersByPhone.size} SMS(s).`);
 };
 
 export const startReminderJob = (): void => {

@@ -21,7 +21,8 @@ model User {
   isAdmin    Boolean  @default(false)
   isVerified Boolean  @default(true)
 
-  events     Event[]
+  events              Event[]
+  eventSubscriptions  EventSubscription[]
 
   @@index([phone])
   @@index([deletedAt])
@@ -35,7 +36,22 @@ model Event {
   completedTasks String?  // JSON array as TEXT
 
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptions  EventSubscription[]
 
   @@index([userId])
   @@index([createdAt])
+}
+
+model EventSubscription {
+  id        String   @id @default(uuid())
+  userId    String
+  eventId   String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+  @@index([userId])
+  @@index([eventId])
 }

@@ -1,9 +1,8 @@
 /** @jsxImportSource @emotion/react */
 import { css } from '@emotion/react';
-import { FC, ReactNode, useState } from 'react';
-import { Box } from '@mui/material';
+import { FC, ReactNode } from 'react';
+import { Box, Container } from '@mui/material';
 
-import { Navigation } from '../Navigation';
 import { Header } from '../Header';
 import { Footer } from '../Footer';
 
@@ -14,27 +13,26 @@ interface LayoutProps {
 }
 
 export const Layout: FC<LayoutProps> = ({ children }) => {
-	const [open, setOpen] = useState(false);
-	const toggleNavigation = () => setOpen((status) => !status);
-
 	return (
 		<div
 			css={css`
 				min-height: 100vh;
+				display: flex;
+				flex-direction: column;
 			`}>
-			<div
-				css={css`
-					display: flex;
-					min-height: calc(100vh - ${FOOTER_HEIGHT}px);
-				`}>
-				<Box component='header'>
-					<Header toggleNavigation={toggleNavigation} />
-				</Box>
-				<Navigation open={open} handleClose={toggleNavigation} />
-				<Box component='main' sx={{ flexGrow: 1, p: 3, pt: 10 }}>
-					{children}
-				</Box>
-			</div>
+			<Box component='header'>
+				<Header />
+			</Box>
+			<Box
+				component='main'
+				sx={{
+					flexGrow: 1,
+					pt: 10,
+					pb: 4,
+					minHeight: `calc(100vh - ${FOOTER_HEIGHT}px)`,
+				}}>
+				<Container maxWidth='md'>{children}</Container>
+			</Box>
 			<Box component='footer'>
 				<Footer />
 			</Box>

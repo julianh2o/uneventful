@@ -7,8 +7,12 @@ import {
 	updateEventTasks,
 } from '../../repositories/eventRepository';
 import { authenticateToken } from '../../middleware/auth';
+import subscriptionsRouter from './subscriptions';
 
 const router = Router();
+
+// Mount subscription routes
+router.use('/', subscriptionsRouter);
 
 // GET /api/events - List all events for the current user
 router.get('/', authenticateToken, async (req, res) => {

@@ -1,7 +1,7 @@
 // APP TEXT
-export const APP_TITLE = 'uneventful';
-export const APP_DESCRIPTION = 'uneventful - Your event management solution';
-export const FOOTER_TEXT = `© ${new Date().getFullYear()} uneventful`;
+export const APP_TITLE = 'unEventful';
+export const APP_DESCRIPTION = 'unEventful - Your event management solution';
+export const FOOTER_TEXT = `© ${new Date().getFullYear()} unEventful`;
 // PAGES TITLE
 export const PAGE_TITLE_HOME = 'Home';
 export const PAGE_TITLE_DASHBOARD = 'Dashboard';
