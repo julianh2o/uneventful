@@ -36,10 +36,11 @@ import ReactMarkdown from 'react-markdown';
 import { APP_TITLE } from '../utils/constants';
 import { getApiBaseUrl } from '../utils/api';
 import { useEvent } from '../hooks/useEvent';
-import { useTasks, Task } from '../hooks/useTasks';
+import { useTasks } from '../hooks/useTasks';
 import { useEventCountdown } from '../hooks/useEventCountdown';
 import { CatBat } from '../components/CatBat';
 import { NotificationToggle } from '../components/NotificationToggle';
+import { areAllSubtasksCompleted } from '../utils/taskHelpers';
 
 const parseEventDate = (dateStr?: string, timeStr?: string): Date | null => {
 	if (!dateStr) return null;
@@ -69,18 +70,26 @@ const CountdownDisplay = ({ days, hours }: { days: number; hours: number }) => {
 
 	return (
 		<Paper
-			elevation={3}
 			sx={{
-				p: 2,
-				px: 4,
-				display: 'inline-block',
-				background: 'linear-gradient(145deg, #667eea 0%, #764ba2 100%)',
+				py: 2,
+				px: 3,
+				mb: 0,
+				background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
 				color: 'white',
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
+				gap: 2,
+				borderBottomLeftRadius: 0,
+				borderBottomRightRadius: 0,
 			}}>
-			<Typography variant='h3' fontWeight='bold' component='span'>
+			<Typography variant='h6' sx={{ fontWeight: 500 }}>
+				Countdown to Event:
+			</Typography>
+			<Typography variant='h4' fontWeight='bold'>
 				{value}
 			</Typography>
-			<Typography variant='h6' component='span' sx={{ ml: 1, opacity: 0.9 }}>
+			<Typography variant='h6' sx={{ fontWeight: 500 }}>
 				{label}
 			</Typography>
 		</Paper>
@@ -222,13 +231,6 @@ export const EventDashboard = () => {
 		setExpandedTasks(next);
 	};
 
-	const getSubtaskKey = (taskName: string, subtask: string) => `${taskName}::${subtask}`;
-
-	const areAllSubtasksCompleted = (task: Task): boolean => {
-		if (!task.subtasks || task.subtasks.length === 0) return completedTasks.has(task.name);
-		return task.subtasks.every((subtask) => completedTasks.has(getSubtaskKey(task.name, subtask)));
-	};
-
 	return (
 		<>
 			<Helmet>
@@ -237,6 +239,9 @@ export const EventDashboard = () => {
 				</title>
 			</Helmet>
 			<Box sx={{ p: 3 }}>
+				{/* Countdown Banner */}
+				{!countdown.passed && <CountdownDisplay days={countdown.days} hours={countdown.hours} />}
+
 				{/* Header */}
 				<Paper
 					sx={{
@@ -246,6 +251,8 @@ export const EventDashboard = () => {
 						color: 'white',
 						textAlign: 'center',
 						position: 'relative',
+						borderTopLeftRadius: countdown.passed ? undefined : 0,
+						borderTopRightRadius: countdown.passed ? undefined : 0,
 					}}>
 					<Box sx={{ position: 'absolute', top: 16, right: 16, display: 'flex', gap: 1 }}>
 						<NotificationToggle eventId={id} color='inherit' />
@@ -273,15 +280,11 @@ export const EventDashboard = () => {
 						sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
 						icon={<PersonIcon sx={{ color: 'white !important' }} />}
 					/>
-				</Paper>
-
-				{/* Countdown */}
-				<Paper sx={{ p: 3, mb: 3, textAlign: 'center' }}>
-					<Typography variant='h6' gutterBottom color='text.secondary'>
-						{countdown.passed ? 'Event has started!' : 'Countdown to Event'}
-					</Typography>
-					{!countdown.passed && <CountdownDisplay days={countdown.days} hours={countdown.hours} />}
-					{countdown.passed && <Chip label='Event is happening now or has passed' color='success' size='medium' />}
+					{countdown.passed && (
+						<Box sx={{ mt: 2 }}>
+							<Chip label='Event is happening now or has passed' color='success' size='medium' />
+						</Box>
+					)}
 				</Paper>
 
 				{/* Event Details */}
@@ -314,7 +317,7 @@ export const EventDashboard = () => {
 						</Typography>
 						<List dense>
 							{tasks.map((task) => {
-								const isCompleted = areAllSubtasksCompleted(task);
+								const isCompleted = areAllSubtasksCompleted(task.name, task.subtasks, data, completedTasks);
 								const overdue = isTaskOverdue(task.deadline) && !isCompleted;
 								const isExpanded = expandedTasks.has(task.name);
 								const hasDescription = Boolean(task.description);

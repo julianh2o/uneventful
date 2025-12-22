@@ -79,19 +79,13 @@ export const getAppTheme = (mode: typeof LIGHT_MODE_THEME | typeof DARK_MODE_THE
 						backgroundImage: 'none',
 					},
 					elevation1: {
-						boxShadow: mode === DARK_MODE_THEME
-							? '0 2px 8px rgba(0, 0, 0, 0.4)'
-							: '0 2px 8px rgba(0, 0, 0, 0.1)',
+						boxShadow: mode === DARK_MODE_THEME ? '0 2px 8px rgba(0, 0, 0, 0.4)' : '0 2px 8px rgba(0, 0, 0, 0.1)',
 					},
 					elevation2: {
-						boxShadow: mode === DARK_MODE_THEME
-							? '0 4px 12px rgba(0, 0, 0, 0.4)'
-							: '0 4px 12px rgba(0, 0, 0, 0.1)',
+						boxShadow: mode === DARK_MODE_THEME ? '0 4px 12px rgba(0, 0, 0, 0.4)' : '0 4px 12px rgba(0, 0, 0, 0.1)',
 					},
 					elevation3: {
-						boxShadow: mode === DARK_MODE_THEME
-							? '0 6px 16px rgba(0, 0, 0, 0.4)'
-							: '0 6px 16px rgba(0, 0, 0, 0.1)',
+						boxShadow: mode === DARK_MODE_THEME ? '0 6px 16px rgba(0, 0, 0, 0.4)' : '0 6px 16px rgba(0, 0, 0, 0.1)',
 					},
 				},
 			},

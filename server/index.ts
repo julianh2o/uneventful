@@ -32,7 +32,11 @@ if (config.isProduction) {
 // Start the server
 // Check for TypeScript (server/index.ts), old compiled (server/dist/index.js), or new compiled (build/index.js) paths
 console.log('[DEBUG] process.argv[1]:', process.argv[1]);
-if (process.argv[1]?.includes('server/index') || process.argv[1]?.includes('server/dist/index') || process.argv[1]?.includes('build/index')) {
+if (
+	process.argv[1]?.includes('server/index') ||
+	process.argv[1]?.includes('server/dist/index') ||
+	process.argv[1]?.includes('build/index')
+) {
 	console.log('[DEBUG] Starting server...');
 	app.listen(config.port, async () => {
 		console.log(`Server running on http://localhost:${config.port}`);

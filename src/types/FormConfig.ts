@@ -1,13 +1,8 @@
+import { Condition } from './Condition';
+
 export interface FormFieldOption {
 	value: string;
 	label: string;
-}
-
-export interface FormFieldCondition {
-	field: string;
-	operator: 'in' | 'equals' | 'notEquals' | 'contains' | 'containsAny';
-	values?: string[];
-	value?: string;
 }
 
 export interface FormField {
@@ -21,7 +16,7 @@ export interface FormField {
 	description?: string;
 	checkboxLabel?: string;
 	options?: FormFieldOption[] | Record<string, string>; // Array or dictionary format
-	condition?: FormFieldCondition;
+	condition?: Condition;
 	disabled?: boolean;
 }
 

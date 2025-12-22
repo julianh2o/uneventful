@@ -31,7 +31,12 @@ export const generateMagicLinkToken = (userId: string, phone: string): string =>
 	return jwt.sign(payload, config.auth.jwtSecret, { expiresIn: MAGIC_LINK_EXPIRY });
 };
 
-export const generateSessionToken = (user: { id: string; phone: string; firstName: string; lastName: string }): string => {
+export const generateSessionToken = (user: {
+	id: string;
+	phone: string;
+	firstName: string;
+	lastName: string;
+}): string => {
 	const payload: Omit<SessionToken, 'exp'> = {
 		userId: user.id,
 		phone: user.phone,

@@ -1,14 +1,9 @@
 import { useState, useEffect } from 'react';
 import { getApiBaseUrl } from '../utils/api';
+import { Task } from '../types/TaskConfig';
 
-export interface Task {
-	id: string;
-	name: string;
-	summary?: string;
-	description: string;
-	deadline: number;
-	subtasks?: string[];
-}
+// Re-export Task for convenience
+export type { Task };
 
 interface UseTasksResult {
 	tasks: Task[];

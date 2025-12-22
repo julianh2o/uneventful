@@ -11,6 +11,7 @@ export interface EventData {
 	partySize?: string;
 	specialRequests?: string;
 	largePartyAgreement?: boolean;
+	[key: string]: unknown;
 }
 
 export interface Event {

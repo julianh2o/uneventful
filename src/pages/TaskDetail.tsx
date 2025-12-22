@@ -29,25 +29,27 @@ import ReactMarkdown from 'react-markdown';
 import { APP_TITLE } from '../utils/constants';
 import { apiClient } from '../utils/apiClient';
 import { reportError } from '../utils/errorReporter';
+import { Task, Subtask, SubtaskItem } from '../types/TaskConfig';
+import { evaluateCondition } from '../utils/taskConditions';
+import {
+	isSubtaskObject,
+	getSubtaskName,
+	getSubtaskKey,
+	countAllSubtasks,
+	collectAllSubtaskKeys,
+} from '../utils/taskHelpers';
 
 interface EventData {
 	eventName?: string;
 	eventDate?: string;
 	eventTime?: string;
+	[key: string]: unknown;
 }
 
 interface Event {
 	id: string;
 	data: EventData;
 	completedTasks?: string[];
-}
-
-interface Task {
-	id: string;
-	name: string;
-	description: string;
-	deadline: number;
-	subtasks?: string[];
 }
 
 const parseEventDate = (dateStr?: string, timeStr?: string): Date | null => {
@@ -69,6 +71,105 @@ const parseEventDate = (dateStr?: string, timeStr?: string): Date | null => {
 	} catch {
 		return null;
 	}
+};
+
+/**
+ * Recursive component for rendering subtasks with nesting support
+ */
+interface RecursiveSubtaskListProps {
+	taskName: string;
+	subtasks: SubtaskItem[];
+	eventData: EventData;
+	completedTasks: Set<string>;
+	onToggle: (subtaskPath: string[]) => void;
+	pathPrefix?: string[];
+	depth?: number;
+}
+
+const RecursiveSubtaskList: React.FC<RecursiveSubtaskListProps> = ({
+	taskName,
+	subtasks,
+	eventData,
+	completedTasks,
+	onToggle,
+	pathPrefix = [],
+	depth = 0,
+}) => {
+	// Filter subtasks based on conditions
+	const visibleSubtasks = subtasks.filter((subtask) => {
+		if (isSubtaskObject(subtask)) {
+			return evaluateCondition(subtask.condition, eventData);
+		}
+		return true;
+	});
+
+	return (
+		<List sx={{ pl: depth * 2 }}>
+			{visibleSubtasks.map((subtask, index) => {
+				const subtaskName = getSubtaskName(subtask);
+				const currentPath = [...pathPrefix, subtaskName];
+				const subtaskKey = getSubtaskKey(taskName, currentPath);
+				const isSubtaskCompleted = completedTasks.has(subtaskKey);
+				const hasNestedSubtasks = isSubtaskObject(subtask) && subtask.subtasks && subtask.subtasks.length > 0;
+
+				return (
+					<React.Fragment key={subtaskKey}>
+						<ListItem
+							sx={{
+								py: 1,
+								borderBottom: index < visibleSubtasks.length - 1 || hasNestedSubtasks ? '1px solid' : 'none',
+								borderColor: 'divider',
+							}}>
+							<ListItemIcon>
+								<Checkbox
+									edge='start'
+									checked={isSubtaskCompleted}
+									onChange={() => onToggle(currentPath)}
+									icon={<UncheckedIcon />}
+									checkedIcon={<CheckCircleIcon color='success' />}
+								/>
+							</ListItemIcon>
+							<ListItemText
+								primary={
+									<Typography
+										variant='body1'
+										sx={{
+											textDecoration: isSubtaskCompleted ? 'line-through' : 'none',
+											color: isSubtaskCompleted ? 'text.secondary' : 'text.primary',
+											fontWeight: depth === 0 ? 500 : 400,
+										}}>
+										{subtaskName}
+									</Typography>
+								}
+								secondary={
+									isSubtaskObject(subtask) && subtask.description ? (
+										<Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>
+											{subtask.description}
+										</Typography>
+									) : null
+								}
+							/>
+						</ListItem>
+
+						{/* Recursively render nested subtasks */}
+						{hasNestedSubtasks && isSubtaskObject(subtask) && (
+							<Box sx={{ ml: 2 }}>
+								<RecursiveSubtaskList
+									taskName={taskName}
+									subtasks={subtask.subtasks!}
+									eventData={eventData}
+									completedTasks={completedTasks}
+									onToggle={onToggle}
+									pathPrefix={currentPath}
+									depth={depth + 1}
+								/>
+							</Box>
+						)}
+					</React.Fragment>
+				);
+			})}
+		</List>
+	);
 };
 
 export const TaskDetail = () => {
@@ -116,8 +217,6 @@ export const TaskDetail = () => {
 		fetchData();
 	}, [eventId, taskId]);
 
-	const getSubtaskKey = (taskName: string, subtask: string) => `${taskName}::${subtask}`;
-
 	const toggleTask = async () => {
 		if (!task) return;
 
@@ -140,10 +239,10 @@ export const TaskDetail = () => {
 		}
 	};
 
-	const toggleSubtask = async (subtask: string) => {
+	const toggleSubtask = async (subtaskPath: string[]) => {
 		if (!task) return;
 
-		const subtaskKey = getSubtaskKey(task.name, subtask);
+		const subtaskKey = getSubtaskKey(task.name, subtaskPath);
 		const next = new Set(completedTasks);
 		if (next.has(subtaskKey)) {
 			next.delete(subtaskKey);
@@ -208,12 +307,12 @@ export const TaskDetail = () => {
 		);
 	}
 
-	const completedCount =
-		task.subtasks?.filter((subtask) => completedTasks.has(getSubtaskKey(task.name, subtask))).length || 0;
-	const totalSubtasks = task.subtasks?.length || 0;
+	// Calculate progress using recursive subtask counting
+	const allSubtaskKeys = collectAllSubtaskKeys(task.name, task.subtasks, event.data);
+	const completedCount = allSubtaskKeys.filter((key) => completedTasks.has(key)).length;
+	const totalSubtasks = countAllSubtasks(task.subtasks, event.data);
 	const progress = totalSubtasks > 0 ? (completedCount / totalSubtasks) * 100 : 0;
-	const isCompleted =
-		totalSubtasks > 0 ? completedCount === totalSubtasks : completedTasks.has(task.name);
+	const isCompleted = totalSubtasks > 0 ? completedCount === totalSubtasks : completedTasks.has(task.name);
 	const overdue = isTaskOverdue(task.deadline) && !isCompleted;
 
 	return (
@@ -309,43 +408,13 @@ export const TaskDetail = () => {
 						<Typography variant='h6' gutterBottom>
 							Subtasks
 						</Typography>
-						<List>
-							{task.subtasks.map((subtask, index) => {
-								const subtaskKey = getSubtaskKey(task.name, subtask);
-								const isSubtaskCompleted = completedTasks.has(subtaskKey);
-								return (
-									<ListItem
-										key={subtaskKey}
-										sx={{
-											py: 1,
-											borderBottom: index < task.subtasks!.length - 1 ? '1px solid' : 'none',
-											borderColor: 'divider',
-										}}>
-										<ListItemIcon>
-											<Checkbox
-												edge='start'
-												checked={isSubtaskCompleted}
-												onChange={() => toggleSubtask(subtask)}
-												icon={<UncheckedIcon />}
-												checkedIcon={<CheckCircleIcon color='success' />}
-											/>
-										</ListItemIcon>
-										<ListItemText
-											primary={
-												<Typography
-													variant='body1'
-													sx={{
-														textDecoration: isSubtaskCompleted ? 'line-through' : 'none',
-														color: isSubtaskCompleted ? 'text.secondary' : 'text.primary',
-													}}>
-													{subtask}
-												</Typography>
-											}
-										/>
-									</ListItem>
-								);
-							})}
-						</List>
+						<RecursiveSubtaskList
+							taskName={task.name}
+							subtasks={task.subtasks}
+							eventData={event.data}
+							completedTasks={completedTasks}
+							onToggle={toggleSubtask}
+						/>
 					</Paper>
 				) : (
 					<Paper sx={{ p: 3, textAlign: 'center' }}>

@@ -51,10 +51,7 @@ function createConfig(): Config {
 		},
 		auth: {
 			jwtSecret: getRequiredEnv('JWT_SECRET'),
-			appBaseUrl: getOptionalEnv(
-				'APP_BASE_URL',
-				nodeEnv === 'production' ? '' : 'http://localhost:2998'
-			),
+			appBaseUrl: getOptionalEnv('APP_BASE_URL', nodeEnv === 'production' ? '' : 'http://localhost:2998'),
 		},
 	};
 }

@@ -156,18 +156,16 @@ pages:
 
           An incomplete list of cleanup expectations follows:
 
-          - Dishes/cups collected from Red Room, office, living room, outside, and other surfaces.
+          - Dishes/cups collected from Red Room, office, living room, outside, and other surfaces
           - Cooking dishes well scrubbed/washed and dried
           - Sink is clear of dishes
-          - Drying rack is clear of dry dishes (note: it's okay to leave damp dishes, but please be mindful of future washed dishes needing a space to go)
+          - Drying rack is clear of dry dishes (damp dishes okay, but leave some space for future dishes)
           - Kitchen table(s) are cleared and wiped down
-          - Sink Strainer emptied and cleaned
-          - Compost taken out to bins
-          - Trash taken out to bins
-          - Recycling taken out to bins
+          - Sink strainer emptied and cleaned
+          - Trash, compost, and recycling taken out to bins
           - Refrigerator cleared of all perishable items that were introduced during the party
 
-          Note: Even if your use of the kitchen is minor and low impact, please be sure to leave it in a better state than you found it
+          Note: Even if your use of the kitchen is minor and low impact, please be sure to leave it in a better state than you found it.
         checkboxLabel: I Agree to the Kitchen Use Terms
         required: true
         condition:

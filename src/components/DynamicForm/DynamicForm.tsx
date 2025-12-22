@@ -24,7 +24,8 @@ import {
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 
-import { FormConfig, FormField, FormFieldCondition, FormFieldOption, FormPage } from '../../types/FormConfig';
+import { FormConfig, FormField, FormFieldOption, FormPage } from '../../types/FormConfig';
+import { Condition } from '../../types/Condition';
 
 interface DynamicFormProps {
 	config: FormConfig;
@@ -91,7 +92,7 @@ export const DynamicForm = ({ config, initialValues, onSubmit }: DynamicFormProp
 	}, []);
 
 	const evaluateCondition = useCallback(
-		(condition: FormFieldCondition): boolean => {
+		(condition: Condition): boolean => {
 			const fieldValue = values[condition.field];
 
 			// Helper to parse JSON array from checkboxGroup
@@ -122,7 +123,7 @@ export const DynamicForm = ({ config, initialValues, onSubmit }: DynamicFormProp
 				case 'containsAny': {
 					// Check if checkboxGroup contains any of the specified values
 					const arrayValue = parseArrayValue(fieldValue);
-					return condition.values?.some((v) => arrayValue.includes(v)) ?? false;
+					return condition.values?.some((v: string) => arrayValue.includes(v)) ?? false;
 				}
 				default:
 					return true;

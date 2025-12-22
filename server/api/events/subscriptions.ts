@@ -93,7 +93,7 @@ router.get('/:eventId/subscribe', authenticateToken, async (req, res) => {
 				? {
 						id: subscription.id,
 						createdAt: subscription.createdAt,
-				  }
+					}
 				: null,
 		});
 	} catch (error) {

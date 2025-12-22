@@ -57,7 +57,12 @@ export const findUserById = async (id: string): Promise<StoredUser | null> => {
 	return toDomainUser(user);
 };
 
-export const createUser = async (userData: { firstName: string; lastName: string; phone: string; email?: string }): Promise<StoredUser> => {
+export const createUser = async (userData: {
+	firstName: string;
+	lastName: string;
+	phone: string;
+	email?: string;
+}): Promise<StoredUser> => {
 	// Check for existing user
 	const existing = await findUserByPhone(userData.phone);
 	if (existing) {
