@@ -226,26 +226,6 @@ pages:
             - '51-100'
             - '100+'
 
-      - id: eventPoster
-        title: Event Posters
-        type: checkboxGroup
-        description: |
-          Event posters provide an easy way of sharing details about an upcoming event. They're especially useful for sharing an event on Instagram for a larger audience, and they're a fun graphical piece that will become a lasting part of Bawdy Shop history. That said, these posters are OPTIONAL unless your event is bigger than 20 people.
-
-          **Some notes:**
-
-          - The best way to make these is with the [Event Posters Canva document](https://www.canva.com/design/DAG1y0CJNlY/Q4hFLOYJqT7MUxlykBbfvQ/edit)—just copy an existing page, or start one from scratch.
-          - For large events (more than 20 people), using the Bawdy Shop "Event Intentions" key on the poster is required; for smaller events, it is strongly recommended.
-          - Using your own method or tool to create posters is fine, but it is strongly recommended to use a size of 1080 x 1350 for consistency and Instagram-friendliness.
-          - For large parties, do *not* include the address of the Bawdy Shop or individual phone numbers on the poster. People can get in touch via Instagram.
-        checkboxLabel: Did you (or will you) make an event poster?
-        required: true
-        options:
-          - value: 'no'
-            label: "Nah, it's small"
-          - value: 'yes'
-            label: "Yes, I'll have a poster"
-
   - title: General Expectations
     description: Based on your selections, please review and agree to the following considerations.
     fields:
@@ -259,9 +239,9 @@ pages:
 
           Keep in mind these general expectations and take steps to intentionally incorporate them into your event planning, communication, etc.
 
-          As long as there are guests on the property, there is at least one designated "host" who has been knowingly tasked with closing the space when the last person leaves. Hosts may delegate this to individuals who are very familiar with the space.
-
-          Events are expected to leave the space better than they found it. Incorporate into your planning some extra time to ensure that there is time to perform extra maintenance that may not be part of your basic party responsibilities.
+          - As long as there are guests on the property, there is at least one designated "host" who has been knowingly tasked with closing the space when the last person leaves. Hosts may delegate this to individuals who are very familiar with the space.
+          - Events are expected to leave the space better than they found it. Incorporate into your planning some extra time to ensure that there is time to perform extra maintenance that may not be part of your basic party responsibilities.
+          - As a shared space with no custodial staff, all cleaning, stocking, and maintenance 
 
           Don't forget, as events grow in size, ambition, and inebriation the amount of labor required to maintain these expectations increases dramatically. Be honest with yourself and your own bandwidth and make sure that you're including reliable volunteers to help share the responsibility, continued hosting privileges depend on this!
         checkboxLabel: I Agree to the General Expectations

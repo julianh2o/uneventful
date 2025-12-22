@@ -18,30 +18,47 @@ tasks:
   - id: event-poster
     name: Create Event Poster
     summary: Design promotional materials and graphics for the event
-    description: Design and finalize promotional materials including digital poster and social media graphics.
+    description: |
+      Event posters provide an easy way of sharing details about an upcoming event. They're especially useful for sharing an event on Instagram for a larger audience, and they're a fun graphical piece that will become a lasting part of Bawdy Shop history.
+
+      **REQUIRED for events with more than 20 people. OPTIONAL for smaller events.**
+
+      **Important Notes:**
+
+      - The best way to make these is with the [Event Posters Canva document](https://www.canva.com/design/DAG1y0CJNlY/Q4hFLOYJqT7MUxlykBbfvQ/edit)—just copy an existing page, or start one from scratch.
+      - Using your own method or tool to create posters is fine, but it is strongly recommended to use a size of 1080 x 1350 for consistency and Instagram-friendliness.
+      - For large parties, do *not* include the address of the Bawdy Shop or individual phone numbers on the poster. People can get in touch via Instagram.
     deadline: 10
     subtasks:
-      - Draft poster design concept
-      - Add event details and branding
-      - Create social media graphics
-      - Get approval from stakeholders
+      - Create poster with all necessary information (name, date, time)
+      - Include Bawdy Shop "Event Intentions" key (required for 20+ guests)
+      - Upload to Event Posters folder in Google Drive
+      - Link poster in Google Calendar event
 
-  - id: send-invites
-    name: Send Invites
-    summary: Send invitations to all guests and track RSVPs
-    description: Send out invitations to all guests via email or preferred communication channel.
-    deadline: 7
+  # - id: send-invites
+  #   name: Send Invites
+  #   summary: Send invitations to all guests and track RSVPs
+  #   description: Send out invitations to all guests via email or preferred communication channel.
+  #   deadline: 7
+  #   subtasks:
+  #     - Compile guest list
+  #     - Draft invitation message
+  #     - Send invitations
+  #     - Track RSVPs
+
+  - id: initial-cleanup
+    name: Initial Cleanup
+    summary: Perform initial cleanup including food storage, hot tub shutdown, and climate control
+    deadline: -1
     subtasks:
-      - Compile guest list
-      - Draft invitation message
-      - Send invitations
-      - Track RSVPs
+      - Store all food items in appropriate locations
+      - Secure and close the hot tub
+      - Turn off the heater and AC units
 
   - id: space-reset
     name: Space Reset
     summary: Clean and restore the venue to its original state
-    description: Clean up the venue, return furniture to original positions, and dispose of any waste.
-    deadline: -1
+    deadline: -3
     subtasks:
       - Remove decorations
       - Return furniture to original positions
@@ -57,7 +74,7 @@ tasks:
       While explicitly checking each item at the completion of a party is not required, get in the habit of making mental notes when passing through these areas and explicitly check the bigger ones that are being used by your event (e.g., toilet paper).
 
       Any items running low, depleted, damaged, or of note should be reported in the appropriate channel or to your coordination contact.
-    deadline: -1
+    deadline: -3
     subtasks:
       - Check toilet paper and paper towels
       - Note kegs/canned drinks and NA beverages inventory

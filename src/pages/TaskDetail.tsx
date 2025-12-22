@@ -15,6 +15,7 @@ import {
 	Checkbox,
 	IconButton,
 	LinearProgress,
+	Button,
 } from '@mui/material';
 import {
 	CheckCircle as CheckCircleIcon,
@@ -117,6 +118,28 @@ export const TaskDetail = () => {
 
 	const getSubtaskKey = (taskName: string, subtask: string) => `${taskName}::${subtask}`;
 
+	const toggleTask = async () => {
+		if (!task) return;
+
+		const next = new Set(completedTasks);
+		if (next.has(task.name)) {
+			next.delete(task.name);
+		} else {
+			next.add(task.name);
+		}
+		setCompletedTasks(next);
+
+		try {
+			await apiClient(`/api/events/${eventId}/tasks`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ completedTasks: Array.from(next) }),
+			});
+		} catch {
+			setCompletedTasks(completedTasks);
+		}
+	};
+
 	const toggleSubtask = async (subtask: string) => {
 		if (!task) return;
 
@@ -189,7 +212,8 @@ export const TaskDetail = () => {
 		task.subtasks?.filter((subtask) => completedTasks.has(getSubtaskKey(task.name, subtask))).length || 0;
 	const totalSubtasks = task.subtasks?.length || 0;
 	const progress = totalSubtasks > 0 ? (completedCount / totalSubtasks) * 100 : 0;
-	const isCompleted = totalSubtasks > 0 && completedCount === totalSubtasks;
+	const isCompleted =
+		totalSubtasks > 0 ? completedCount === totalSubtasks : completedTasks.has(task.name);
 	const overdue = isTaskOverdue(task.deadline) && !isCompleted;
 
 	return (
@@ -280,7 +304,7 @@ export const TaskDetail = () => {
 				)}
 
 				{/* Subtasks */}
-				{task.subtasks && task.subtasks.length > 0 && (
+				{task.subtasks && task.subtasks.length > 0 ? (
 					<Paper sx={{ p: 2 }}>
 						<Typography variant='h6' gutterBottom>
 							Subtasks
@@ -322,6 +346,18 @@ export const TaskDetail = () => {
 								);
 							})}
 						</List>
+					</Paper>
+				) : (
+					<Paper sx={{ p: 3, textAlign: 'center' }}>
+						<Button
+							variant={isCompleted ? 'outlined' : 'contained'}
+							color={isCompleted ? 'success' : 'primary'}
+							size='large'
+							startIcon={isCompleted ? <CheckCircleIcon /> : undefined}
+							onClick={toggleTask}
+							sx={{ minWidth: 200 }}>
+							{isCompleted ? 'Mark as Incomplete' : 'Mark as Complete'}
+						</Button>
 					</Paper>
 				)}
 

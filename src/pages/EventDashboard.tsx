@@ -12,16 +12,15 @@ import {
 	ListItem,
 	ListItemIcon,
 	ListItemText,
-	Checkbox,
 	Collapse,
 	Button,
 	IconButton,
 } from '@mui/material';
 import {
-	CheckCircle as CheckCircleIcon,
-	RadioButtonUnchecked as UncheckedIcon,
 	ChevronRight as ChevronRightIcon,
 	Edit as EditIcon,
+	CheckCircle as CheckCircleIcon,
+	RadioButtonUnchecked as UncheckedIcon,
 } from '@mui/icons-material';
 import {
 	Event as EventIcon,
@@ -176,6 +175,21 @@ export const EventDashboard = () => {
 		return dueDate.toLocaleDateString();
 	};
 
+	const formatRelativeDate = (deadline: number): string => {
+		const dueDate = getTaskDueDate(deadline);
+		if (!dueDate) return '';
+
+		const now = new Date();
+		const diffMs = dueDate.getTime() - now.getTime();
+		const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+		if (diffDays === 0) return 'today';
+		if (diffDays === 1) return 'tomorrow';
+		if (diffDays === -1) return 'yesterday';
+		if (diffDays > 0) return `in ${diffDays} day${diffDays === 1 ? '' : 's'}`;
+		return `${Math.abs(diffDays)} day${Math.abs(diffDays) === 1 ? '' : 's'} ago`;
+	};
+
 	const toggleTask = async (taskKey: string) => {
 		const next = new Set(completedTasks);
 		if (next.has(taskKey)) {
@@ -212,11 +226,6 @@ export const EventDashboard = () => {
 	const areAllSubtasksCompleted = (task: Task): boolean => {
 		if (!task.subtasks || task.subtasks.length === 0) return completedTasks.has(task.name);
 		return task.subtasks.every((subtask) => completedTasks.has(getSubtaskKey(task.name, subtask)));
-	};
-
-	const getCompletedSubtaskCount = (task: Task): number => {
-		if (!task.subtasks) return 0;
-		return task.subtasks.filter((subtask) => completedTasks.has(getSubtaskKey(task.name, subtask))).length;
 	};
 
 	return (
@@ -307,9 +316,7 @@ export const EventDashboard = () => {
 								const isCompleted = areAllSubtasksCompleted(task);
 								const overdue = isTaskOverdue(task.deadline) && !isCompleted;
 								const isExpanded = expandedTasks.has(task.name);
-								const hasSubtasks = task.subtasks && task.subtasks.length > 0;
-								const completedCount = getCompletedSubtaskCount(task);
-								const totalSubtasks = task.subtasks?.length || 0;
+								const hasDescription = Boolean(task.description);
 
 								return (
 									<React.Fragment key={task.name}>
@@ -326,39 +333,46 @@ export const EventDashboard = () => {
 												},
 											}}
 											secondaryAction={
-												<Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-													{hasSubtasks && (
-														<Chip
-															size='small'
-															label={`${completedCount}/${totalSubtasks}`}
-															color={isCompleted ? 'success' : 'default'}
-															variant='outlined'
-														/>
-													)}
-													<CatBat enabled={overdue}>
-														<Chip
-															size='small'
-															label={formatDueDate(task.deadline)}
-															color={overdue ? 'error' : 'default'}
-															variant={overdue ? 'filled' : 'outlined'}
-														/>
-													</CatBat>
-												</Box>
+												<CatBat enabled={overdue}>
+													<Chip
+														size='small'
+														label={formatRelativeDate(task.deadline)}
+														color={overdue ? 'error' : 'default'}
+														variant={overdue ? 'filled' : 'outlined'}
+														title={formatDueDate(task.deadline)}
+													/>
+												</CatBat>
 											}>
 											<ListItemIcon sx={{ minWidth: 40 }}>
-												<IconButton
-													size='small'
-													onClick={(e) => {
-														e.preventDefault();
-														e.stopPropagation();
-														toggleExpanded(task.name);
-													}}
-													sx={{
-														transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
-														transition: 'transform 0.2s',
-													}}>
-													<ChevronRightIcon />
-												</IconButton>
+												{hasDescription ? (
+													<IconButton
+														size='small'
+														onClick={(e) => {
+															e.preventDefault();
+															e.stopPropagation();
+															toggleExpanded(task.name);
+														}}
+														sx={{
+															transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+															transition: 'transform 0.2s',
+														}}>
+														<ChevronRightIcon />
+													</IconButton>
+												) : (
+													<IconButton
+														size='small'
+														onClick={(e) => {
+															e.preventDefault();
+															e.stopPropagation();
+															toggleTask(task.name);
+														}}>
+														{isCompleted ? (
+															<CheckCircleIcon color='success' fontSize='small' />
+														) : (
+															<UncheckedIcon fontSize='small' />
+														)}
+													</IconButton>
+												)}
 											</ListItemIcon>
 											<ListItemText
 												primary={
@@ -376,7 +390,7 @@ export const EventDashboard = () => {
 											/>
 										</ListItem>
 
-										{/* Description and Subtasks */}
+										{/* Description */}
 										<Collapse in={isExpanded} timeout='auto' unmountOnExit>
 											{task.description && (
 												<Box
@@ -393,40 +407,6 @@ export const EventDashboard = () => {
 													}}>
 													<ReactMarkdown>{task.description}</ReactMarkdown>
 												</Box>
-											)}
-											{hasSubtasks && (
-												<List dense disablePadding sx={{ pl: 4 }}>
-													{task.subtasks!.map((subtask) => {
-														const subtaskKey = getSubtaskKey(task.name, subtask);
-														const isSubtaskCompleted = completedTasks.has(subtaskKey);
-														return (
-															<ListItem key={subtaskKey} sx={{ py: 0.25 }}>
-																<ListItemIcon sx={{ minWidth: 36 }}>
-																	<Checkbox
-																		edge='start'
-																		size='small'
-																		checked={isSubtaskCompleted}
-																		onChange={() => toggleTask(subtaskKey)}
-																		icon={<UncheckedIcon fontSize='small' />}
-																		checkedIcon={<CheckCircleIcon color='success' fontSize='small' />}
-																	/>
-																</ListItemIcon>
-																<ListItemText
-																	primary={
-																		<Typography
-																			variant='body2'
-																			sx={{
-																				textDecoration: isSubtaskCompleted ? 'line-through' : 'none',
-																				color: isSubtaskCompleted ? 'text.secondary' : 'text.primary',
-																			}}>
-																			{subtask}
-																		</Typography>
-																	}
-																/>
-															</ListItem>
-														);
-													})}
-												</List>
 											)}
 										</Collapse>
 									</React.Fragment>
