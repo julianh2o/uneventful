@@ -1,9 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaLibSql } from '@prisma/adapter-libsql';
+import { config } from './config';
 
 // Create Prisma adapter with database URL
 const adapter = new PrismaLibSql({
-	url: process.env.DATABASE_URL || 'file:./data/uneventful.db',
+	url: config.database.url,
 });
 
 // Singleton pattern to prevent multiple instances
@@ -13,10 +14,10 @@ export const prisma =
 	globalForPrisma.prisma ||
 	new PrismaClient({
 		adapter,
-		log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+		log: config.isDevelopment ? ['query', 'error', 'warn'] : ['error'],
 	});
 
-if (process.env.NODE_ENV !== 'production') {
+if (!config.isProduction) {
 	globalForPrisma.prisma = prisma;
 }
 

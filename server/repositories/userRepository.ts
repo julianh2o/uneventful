@@ -3,7 +3,8 @@ import { User } from '@prisma/client';
 
 export interface StoredUser {
 	id: string;
-	name: string;
+	firstName: string;
+	lastName: string;
 	phone: string;
 	email?: string | null;
 	createdAt: string;
@@ -17,7 +18,8 @@ export interface StoredUser {
 // Convert Prisma User to StoredUser (maintains backward compatibility with ISO 8601 strings)
 const toDomainUser = (user: User): StoredUser => ({
 	id: user.id,
-	name: user.name,
+	firstName: user.firstName,
+	lastName: user.lastName,
 	phone: user.phone,
 	email: user.email,
 	createdAt: user.createdAt.toISOString(),
@@ -55,7 +57,7 @@ export const findUserById = async (id: string): Promise<StoredUser | null> => {
 	return toDomainUser(user);
 };
 
-export const createUser = async (userData: { name: string; phone: string; email?: string }): Promise<StoredUser> => {
+export const createUser = async (userData: { firstName: string; lastName: string; phone: string; email?: string }): Promise<StoredUser> => {
 	// Check for existing user
 	const existing = await findUserByPhone(userData.phone);
 	if (existing) {
@@ -64,7 +66,8 @@ export const createUser = async (userData: { name: string; phone: string; email?
 
 	const user = await prisma.user.create({
 		data: {
-			name: userData.name,
+			firstName: userData.firstName,
+			lastName: userData.lastName,
 			phone: userData.phone,
 			email: userData.email,
 			isActive: true,

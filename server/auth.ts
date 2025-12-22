@@ -1,10 +1,9 @@
 import jwt from 'jsonwebtoken';
 import { formatSmsMessage } from './smsMessages';
+import { config } from './config';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 const MAGIC_LINK_EXPIRY = '15m';
 const SESSION_EXPIRY = '30d';
-const APP_BASE_URL = process.env.APP_BASE_URL || 'http://localhost:2998';
 
 export interface MagicLinkToken {
 	userId: string;
@@ -16,7 +15,8 @@ export interface MagicLinkToken {
 export interface SessionToken {
 	userId: string;
 	phone: string;
-	name: string;
+	firstName: string;
+	lastName: string;
 	type: 'session';
 	exp: number;
 }
@@ -28,23 +28,24 @@ export const generateMagicLinkToken = (userId: string, phone: string): string =>
 		type: 'magic_link',
 	};
 
-	return jwt.sign(payload, JWT_SECRET, { expiresIn: MAGIC_LINK_EXPIRY });
+	return jwt.sign(payload, config.auth.jwtSecret, { expiresIn: MAGIC_LINK_EXPIRY });
 };
 
-export const generateSessionToken = (user: { id: string; phone: string; name: string }): string => {
+export const generateSessionToken = (user: { id: string; phone: string; firstName: string; lastName: string }): string => {
 	const payload: Omit<SessionToken, 'exp'> = {
 		userId: user.id,
 		phone: user.phone,
-		name: user.name,
+		firstName: user.firstName,
+		lastName: user.lastName,
 		type: 'session',
 	};
 
-	return jwt.sign(payload, JWT_SECRET, { expiresIn: SESSION_EXPIRY });
+	return jwt.sign(payload, config.auth.jwtSecret, { expiresIn: SESSION_EXPIRY });
 };
 
 export const verifyMagicLinkToken = (token: string): MagicLinkToken | null => {
 	try {
-		const decoded = jwt.verify(token, JWT_SECRET) as MagicLinkToken;
+		const decoded = jwt.verify(token, config.auth.jwtSecret) as MagicLinkToken;
 
 		if (decoded.type !== 'magic_link') {
 			return null;
@@ -59,7 +60,7 @@ export const verifyMagicLinkToken = (token: string): MagicLinkToken | null => {
 
 export const verifySessionToken = (token: string): SessionToken | null => {
 	try {
-		const decoded = jwt.verify(token, JWT_SECRET) as SessionToken;
+		const decoded = jwt.verify(token, config.auth.jwtSecret) as SessionToken;
 
 		if (decoded.type !== 'session') {
 			return null;
@@ -73,12 +74,12 @@ export const verifySessionToken = (token: string): SessionToken | null => {
 };
 
 export const generateMagicLinkUrl = (token: string): string => {
-	return `${APP_BASE_URL}/auth/verify?token=${token}`;
+	return `${config.auth.appBaseUrl}/auth/verify?token=${token}`;
 };
 
-export const formatMagicLinkSms = (name: string, magicLinkUrl: string): string => {
+export const formatMagicLinkSms = (firstName: string, magicLinkUrl: string): string => {
 	return formatSmsMessage('magicLink', {
-		name,
+		name: firstName,
 		magicLinkUrl,
 	});
 };

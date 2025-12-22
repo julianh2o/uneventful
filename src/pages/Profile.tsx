@@ -8,7 +8,8 @@ import { apiClient } from '../utils/apiClient';
 
 export const Profile = () => {
 	const { user, refreshUser } = useAuth();
-	const [name, setName] = useState(user?.name || '');
+	const [firstName, setFirstName] = useState(user?.firstName || '');
+	const [lastName, setLastName] = useState(user?.lastName || '');
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState(false);
@@ -25,7 +26,7 @@ export const Profile = () => {
 				headers: {
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({ name }),
+				body: JSON.stringify({ firstName, lastName }),
 			});
 
 			if (!response.ok) {
@@ -68,9 +69,19 @@ export const Profile = () => {
 
 						<TextField
 							fullWidth
-							label='Name'
-							value={name}
-							onChange={(e) => setName(e.target.value)}
+							label='First Name'
+							value={firstName}
+							onChange={(e) => setFirstName(e.target.value)}
+							margin='normal'
+							required
+							disabled={loading}
+						/>
+
+						<TextField
+							fullWidth
+							label='Last Name'
+							value={lastName}
+							onChange={(e) => setLastName(e.target.value)}
 							margin='normal'
 							required
 							disabled={loading}
@@ -91,7 +102,7 @@ export const Profile = () => {
 								variant='contained'
 								color='primary'
 								size='large'
-								disabled={loading || name === user?.name}>
+								disabled={loading || (firstName === user?.firstName && lastName === user?.lastName)}>
 								{loading ? <CircularProgress size={24} /> : 'Save Changes'}
 							</Button>
 						</Box>

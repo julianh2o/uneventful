@@ -1,5 +1,6 @@
 import path from 'path';
 import appRoot from 'app-root-path';
+import { config } from '../config';
 
 /**
  * Centralized path resolution utility for the server
@@ -12,8 +13,7 @@ import appRoot from 'app-root-path';
  * In production: /build/config
  */
 export const getConfigPath = (): string => {
-	const isProduction = process.env.NODE_ENV === 'production';
-	return path.join(appRoot.path, isProduction ? 'build' : 'src', 'config');
+	return path.join(appRoot.path, config.isProduction ? 'build' : 'src', 'config');
 };
 
 /**
@@ -58,8 +58,7 @@ export const getUsersFilePath = (): string => {
  * In production: /build/public
  */
 export const getBuildPath = (): string => {
-	const isProduction = process.env.NODE_ENV === 'production';
-	return path.join(appRoot.path, 'build', isProduction ? 'public' : '');
+	return path.join(appRoot.path, 'build', config.isProduction ? 'public' : '');
 };
 
 /**

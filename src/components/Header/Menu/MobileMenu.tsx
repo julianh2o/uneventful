@@ -7,6 +7,7 @@ import { SignOut, Settings } from '../../Actions';
 import { ThemeSwitcher } from '../ThemeSwitcher';
 import { ThemeModeContext } from '../../../contexts';
 import { useAuth } from '../../../hooks/useAuth';
+import { formatNameWithInitial } from '../../../utils/formatName';
 
 interface MobileMenuProps {
 	isMenuOpen: boolean;
@@ -48,7 +49,7 @@ export const MobileMenu = ({ isMenuOpen, handleMenuOpen, handleMenuClose, anchor
 			<Box sx={{ textAlign: 'center' }}>
 				<MenuItem onClick={handleProfileClick}>
 					<AccountCircleIcon sx={{ mr: 1 }} />
-					{user?.name || 'Profile'}
+					{user ? formatNameWithInitial(user.firstName, user.lastName) : 'Profile'}
 				</MenuItem>
 				<MenuItem onClick={toggleThemeMode}>
 					<ThemeSwitcher disableTooltip />

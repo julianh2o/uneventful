@@ -7,7 +7,8 @@ declare global {
 			user?: {
 				id: string;
 				phone: string;
-				name: string;
+				firstName: string;
+				lastName: string;
 			};
 		}
 	}
@@ -32,7 +33,8 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
 	req.user = {
 		id: decoded.userId,
 		phone: decoded.phone,
-		name: decoded.name,
+		firstName: decoded.firstName,
+		lastName: decoded.lastName,
 	};
 
 	next();

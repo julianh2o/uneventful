@@ -1,14 +1,7 @@
 import twilio from 'twilio';
+import { config } from './config';
 
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const fromNumber = process.env.TWILIO_PHONE_NUMBER;
-
-if (!accountSid || !authToken || !fromNumber) {
-	console.warn('Twilio credentials not configured. SMS functionality will be disabled.');
-}
-
-const client = accountSid && authToken ? twilio(accountSid, authToken) : null;
+const client = twilio(config.twilio.accountSid, config.twilio.authToken);
 
 export interface SendSmsParams {
 	to: string;
@@ -22,14 +15,10 @@ export interface SmsResult {
 }
 
 export const sendSms = async ({ to, message }: SendSmsParams): Promise<SmsResult> => {
-	if (!client || !fromNumber) {
-		return { success: false, error: 'Twilio is not configured' };
-	}
-
 	try {
 		const result = await client.messages.create({
 			body: message,
-			from: fromNumber,
+			from: config.twilio.phoneNumber,
 			to: to,
 		});
 

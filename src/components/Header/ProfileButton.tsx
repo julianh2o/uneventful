@@ -4,6 +4,7 @@ import { IconButton, Tooltip, Box, Typography } from '@mui/material';
 import { AccountCircle as AccountCircleIcon } from '@mui/icons-material';
 
 import { useAuth } from '../../hooks/useAuth';
+import { formatNameWithInitial } from '../../utils/formatName';
 
 export const ProfileButton = () => {
 	const { user } = useAuth();
@@ -27,7 +28,7 @@ export const ProfileButton = () => {
 						display: { xs: 'none', md: 'block' },
 						textTransform: 'none',
 					}}>
-					{user?.name || 'User'}
+					{user ? formatNameWithInitial(user.firstName, user.lastName) : 'User'}
 				</Typography>
 			</IconButton>
 		</Tooltip>

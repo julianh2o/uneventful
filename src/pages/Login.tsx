@@ -9,7 +9,8 @@ import { requestMagicLink, registerUser } from '../services/authService';
 export const Login = () => {
 	const [step, setStep] = useState<'phone' | 'name' | 'sent'>('phone');
 	const [phone, setPhone] = useState('');
-	const [name, setName] = useState('');
+	const [firstName, setFirstName] = useState('');
+	const [lastName, setLastName] = useState('');
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [success, setSuccess] = useState<string | null>(null);
@@ -49,7 +50,7 @@ export const Login = () => {
 		setLoading(true);
 
 		try {
-			const result = await registerUser(phone, name);
+			const result = await registerUser(phone, firstName, lastName);
 
 			if (!result.success) {
 				setError(result.error || 'Failed to create account');
@@ -135,15 +136,26 @@ export const Login = () => {
 						<form onSubmit={handleNameSubmit}>
 							<TextField
 								fullWidth
-								label='Your Name'
-								placeholder='John Smith'
-								value={name}
-								onChange={(e) => setName(e.target.value)}
+								label='First Name'
+								placeholder='John'
+								value={firstName}
+								onChange={(e) => setFirstName(e.target.value)}
 								disabled={loading}
 								required
 								InputProps={{
 									startAdornment: <Person sx={{ mr: 1, color: 'action.active' }} />,
 								}}
+								sx={{ mb: 2 }}
+							/>
+
+							<TextField
+								fullWidth
+								label='Last Name'
+								placeholder='Smith'
+								value={lastName}
+								onChange={(e) => setLastName(e.target.value)}
+								disabled={loading}
+								required
 								sx={{ mb: 3 }}
 							/>
 
@@ -179,7 +191,8 @@ export const Login = () => {
 								onClick={() => {
 									setStep('phone');
 									setPhone('');
-									setName('');
+									setFirstName('');
+									setLastName('');
 									setError(null);
 									setSuccess(null);
 								}}>

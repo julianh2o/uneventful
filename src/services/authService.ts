@@ -4,7 +4,8 @@ const TOKEN_KEY = 'uneventful_session_token';
 
 export interface AuthUser {
 	id: string;
-	name: string;
+	firstName: string;
+	lastName: string;
 	phone: string;
 }
 
@@ -56,13 +57,13 @@ export const requestMagicLink = async (phone: string): Promise<AuthRequestRespon
 	return response.json();
 };
 
-export const registerUser = async (phone: string, name: string): Promise<RegisterResponse> => {
+export const registerUser = async (phone: string, firstName: string, lastName: string): Promise<RegisterResponse> => {
 	const response = await fetch(`${getApiBaseUrl()}/api/auth/register`, {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
 		},
-		body: JSON.stringify({ phone, name }),
+		body: JSON.stringify({ phone, firstName, lastName }),
 	});
 
 	return response.json();

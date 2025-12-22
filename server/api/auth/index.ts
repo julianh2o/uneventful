@@ -54,7 +54,7 @@ router.post('/request', async (req, res) => {
 
 		const magicToken = generateMagicLinkToken(existingUser.id, normalizedPhone);
 		const magicLinkUrl = generateMagicLinkUrl(magicToken);
-		const smsMessage = formatMagicLinkSms(existingUser.name, magicLinkUrl);
+		const smsMessage = formatMagicLinkSms(existingUser.firstName, magicLinkUrl);
 
 		const smsResult = await sendSms({
 			to: normalizedPhone,
@@ -87,12 +87,12 @@ router.post('/request', async (req, res) => {
 // POST /api/auth/register - Register new user
 router.post('/register', async (req, res) => {
 	try {
-		const { phone, name } = req.body;
+		const { phone, firstName, lastName } = req.body;
 
-		if (!phone || !name) {
+		if (!phone || !firstName || !lastName) {
 			return res.status(400).json({
 				success: false,
-				error: 'Phone number and name are required',
+				error: 'Phone number, first name, and last name are required',
 			});
 		}
 
@@ -115,13 +115,14 @@ router.post('/register', async (req, res) => {
 		}
 
 		const newUser = await createUser({
-			name: name.trim(),
+			firstName: firstName.trim(),
+			lastName: lastName.trim(),
 			phone: normalizedPhone,
 		});
 
 		const magicToken = generateMagicLinkToken(newUser.id, normalizedPhone);
 		const magicLinkUrl = generateMagicLinkUrl(magicToken);
-		const smsMessage = formatMagicLinkSms(newUser.name, magicLinkUrl);
+		const smsMessage = formatMagicLinkSms(newUser.firstName, magicLinkUrl);
 
 		const smsResult = await sendSms({
 			to: normalizedPhone,
@@ -183,7 +184,8 @@ router.get('/verify', async (req, res) => {
 		const sessionToken = generateSessionToken({
 			id: user.id,
 			phone: user.phone,
-			name: user.name,
+			firstName: user.firstName,
+			lastName: user.lastName,
 		});
 
 		return res.json({
@@ -191,7 +193,8 @@ router.get('/verify', async (req, res) => {
 			sessionToken,
 			user: {
 				id: user.id,
-				name: user.name,
+				firstName: user.firstName,
+				lastName: user.lastName,
 				phone: user.phone,
 			},
 		});
@@ -215,7 +218,8 @@ router.get('/me', authenticateToken, async (req, res) => {
 
 		return res.json({
 			id: user.id,
-			name: user.name,
+			firstName: user.firstName,
+			lastName: user.lastName,
 			phone: user.phone,
 			email: user.email,
 			isActive: user.isActive,
@@ -233,17 +237,25 @@ router.get('/me', authenticateToken, async (req, res) => {
 // PATCH /api/auth/me - Update current user
 router.patch('/me', authenticateToken, async (req, res) => {
 	try {
-		const { name } = req.body;
+		const { firstName, lastName } = req.body;
 
-		if (!name || typeof name !== 'string' || name.trim().length === 0) {
-			return res.status(400).json({ error: 'Name is required' });
+		if (!firstName || typeof firstName !== 'string' || firstName.trim().length === 0) {
+			return res.status(400).json({ error: 'First name is required' });
 		}
 
-		const updatedUser = await updateUser(req.user!.id, { name: name.trim() });
+		if (!lastName || typeof lastName !== 'string' || lastName.trim().length === 0) {
+			return res.status(400).json({ error: 'Last name is required' });
+		}
+
+		const updatedUser = await updateUser(req.user!.id, {
+			firstName: firstName.trim(),
+			lastName: lastName.trim(),
+		});
 
 		return res.json({
 			id: updatedUser.id,
-			name: updatedUser.name,
+			firstName: updatedUser.firstName,
+			lastName: updatedUser.lastName,
 			phone: updatedUser.phone,
 			email: updatedUser.email,
 			isActive: updatedUser.isActive,

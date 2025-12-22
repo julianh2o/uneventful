@@ -71,7 +71,7 @@ export const EventRegistration = ({ editMode = false }: EventRegistrationProps) 
 
 				// Auto-populate host fields from logged-in user
 				if (user) {
-					baseValues.hostName = user.name;
+					baseValues.hostName = `${user.firstName} ${user.lastName}`;
 					baseValues.hostContact = user.phone;
 				}
 

@@ -14,15 +14,26 @@ export type User = {
 	id: string;
 
 	/**
-	 * The user's name
+	 * The user's first name
 	 * @type {string}
 	 * @memberof User
-	 * @property name
+	 * @property firstName
 	 * @required
 	 * @example
-	 * "John Smith"
+	 * "John"
 	 */
-	name: string;
+	firstName: string;
+
+	/**
+	 * The user's last name
+	 * @type {string}
+	 * @memberof User
+	 * @property lastName
+	 * @required
+	 * @example
+	 * "Smith"
+	 */
+	lastName: string;
 
 	/**
 	 * The user's phone number (E.164 format)
