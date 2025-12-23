@@ -1,30 +1,35 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import request from 'supertest';
 import app from '../../index';
-import { writeUsers, readUsers, findUserByPhone } from '../../userStorage';
+import { findUserByPhone } from '../../repositories/userRepository';
 import { clearRateLimits } from '../../rateLimit';
+import { prisma } from '../../db';
 
 describe('POST /api/auth/register', () => {
 	beforeEach(() => {
 		clearRateLimits();
 	});
 
-	afterEach(() => {
+	afterEach(async () => {
 		// Clean up test users
-		const users = readUsers();
-		const cleanedUsers = users.filter((u) => !u.phone.startsWith('+1555555'));
-		writeUsers(cleanedUsers);
+		await prisma.user.deleteMany({
+			where: {
+				phone: {
+					startsWith: '+1555555',
+				},
+			},
+		});
 		clearRateLimits();
 	});
 
 	describe('Validation', () => {
 		it('should return 400 when phone is missing', async () => {
-			const response = await request(app).post('/api/auth/register').send({ name: 'Test User' });
+			const response = await request(app).post('/api/auth/register').send({ firstName: 'Test', lastName: 'User' });
 
 			expect(response.status).toBe(400);
 			expect(response.body).toEqual({
 				success: false,
-				error: 'Phone number and name are required',
+				error: 'Phone number, first name, and last name are required',
 			});
 		});
 
@@ -34,7 +39,7 @@ describe('POST /api/auth/register', () => {
 			expect(response.status).toBe(400);
 			expect(response.body).toEqual({
 				success: false,
-				error: 'Phone number and name are required',
+				error: 'Phone number, first name, and last name are required',
 			});
 		});
 
@@ -43,13 +48,14 @@ describe('POST /api/auth/register', () => {
 
 			expect(response.status).toBe(400);
 			expect(response.body.success).toBe(false);
-			expect(response.body.error).toBe('Phone number and name are required');
+			expect(response.body.error).toBe('Phone number, first name, and last name are required');
 		});
 
 		it('should return 400 when phone is null', async () => {
 			const response = await request(app).post('/api/auth/register').send({
 				phone: null,
-				name: 'Test User',
+				firstName: 'Test',
+				lastName: 'User',
 			});
 
 			expect(response.status).toBe(400);
@@ -59,7 +65,8 @@ describe('POST /api/auth/register', () => {
 		it('should return 400 when name is null', async () => {
 			const response = await request(app).post('/api/auth/register').send({
 				phone: '+15555551234',
-				name: null,
+				firstName: null,
+				lastName: null,
 			});
 
 			expect(response.status).toBe(400);
@@ -69,7 +76,8 @@ describe('POST /api/auth/register', () => {
 		it('should return 400 when phone is empty string', async () => {
 			const response = await request(app).post('/api/auth/register').send({
 				phone: '',
-				name: 'Test User',
+				firstName: 'Test',
+				lastName: 'User',
 			});
 
 			expect(response.status).toBe(400);
@@ -79,7 +87,8 @@ describe('POST /api/auth/register', () => {
 		it('should return 400 when name is empty string', async () => {
 			const response = await request(app).post('/api/auth/register').send({
 				phone: '+15555551234',
-				name: '',
+				firstName: '',
+				lastName: '',
 			});
 
 			expect(response.status).toBe(400);
@@ -90,9 +99,10 @@ describe('POST /api/auth/register', () => {
 	describe('Successful Registration', () => {
 		it('should create new user with valid data', async () => {
 			const phone = '+15555559999';
-			const name = 'New Test User';
+			const firstName = 'New';
+			const lastName = 'User';
 
-			const response = await request(app).post('/api/auth/register').send({ phone, name });
+			const response = await request(app).post('/api/auth/register').send({ phone, firstName, lastName });
 
 			expect(response.status).toBe(200);
 			expect(response.body).toEqual({
@@ -101,23 +111,25 @@ describe('POST /api/auth/register', () => {
 			});
 
 			// Verify user was created
-			const user = findUserByPhone(phone);
+			const user = await findUserByPhone(phone);
 			expect(user).toBeDefined();
-			expect(user?.name).toBe(name);
+			expect(user?.firstName).toBe(firstName);
+			expect(user?.lastName).toBe(lastName);
 			expect(user?.phone).toBe(phone);
 		});
 
 		it('should normalize phone number before creating user', async () => {
 			const response = await request(app).post('/api/auth/register').send({
 				phone: '5555558888', // Should normalize to +15555558888
-				name: 'Test User',
+				firstName: 'Test',
+				lastName: 'User',
 			});
 
 			expect(response.status).toBe(200);
 			expect(response.body.success).toBe(true);
 
 			// Verify user was created with normalized phone
-			const user = findUserByPhone('+15555558888');
+			const user = await findUserByPhone('+15555558888');
 			expect(user).toBeDefined();
 		});
 
@@ -125,23 +137,26 @@ describe('POST /api/auth/register', () => {
 			const phone = '+15555557777';
 			const response = await request(app).post('/api/auth/register').send({
 				phone,
-				name: '  Test User  ',
+				firstName: '  Test  ',
+				lastName: '  User  ',
 			});
 
 			expect(response.status).toBe(200);
 
-			const user = findUserByPhone(phone);
-			expect(user?.name).toBe('Test User'); // No whitespace
+			const user = await findUserByPhone(phone);
+			expect(user?.firstName).toBe('Test'); // No whitespace
+			expect(user?.lastName).toBe('User'); // No whitespace
 		});
 
 		it('should create user with default flags', async () => {
 			const phone = '+15555556666';
 			await request(app).post('/api/auth/register').send({
 				phone,
-				name: 'Test User',
+				firstName: 'Test',
+				lastName: 'User',
 			});
 
-			const user = findUserByPhone(phone);
+			const user = await findUserByPhone(phone);
 			expect(user?.isActive).toBe(true);
 			expect(user?.isAdmin).toBe(false);
 			expect(user?.isVerified).toBe(true);
@@ -151,10 +166,11 @@ describe('POST /api/auth/register', () => {
 			const phone = '+15555555555';
 			await request(app).post('/api/auth/register').send({
 				phone,
-				name: 'Test User',
+				firstName: 'Test',
+				lastName: 'User',
 			});
 
-			const user = findUserByPhone(phone);
+			const user = await findUserByPhone(phone);
 			expect(user?.createdAt).toBeDefined();
 			expect(user?.updatedAt).toBeDefined();
 			expect(new Date(user!.createdAt).getTime()).toBeGreaterThan(0);
@@ -163,31 +179,35 @@ describe('POST /api/auth/register', () => {
 		it('should handle 11-digit phone format', async () => {
 			const response = await request(app).post('/api/auth/register').send({
 				phone: '15555554444', // Should normalize to +15555554444
-				name: 'Test User',
+				firstName: 'Test',
+				lastName: 'User',
 			});
 
 			expect(response.status).toBe(200);
-			const user = findUserByPhone('+15555554444');
+			const user = await findUserByPhone('+15555554444');
 			expect(user).toBeDefined();
 		});
 	});
 
 	describe('Duplicate User Handling', () => {
 		const existingPhone = '+15555553333';
-		const existingName = 'Existing User';
+		const existingFirstName = 'Existing';
+		const existingLastName = 'User';
 
 		beforeEach(async () => {
 			// Create an existing user
 			await request(app).post('/api/auth/register').send({
 				phone: existingPhone,
-				name: existingName,
+				firstName: existingFirstName,
+				lastName: existingLastName,
 			});
 		});
 
 		it('should return 400 when phone already exists', async () => {
 			const response = await request(app).post('/api/auth/register').send({
 				phone: existingPhone,
-				name: 'Different Name',
+				firstName: 'Different',
+				lastName: 'Name',
 			});
 
 			expect(response.status).toBe(400);
@@ -200,7 +220,8 @@ describe('POST /api/auth/register', () => {
 		it('should return 400 for normalized duplicate phone', async () => {
 			const response = await request(app).post('/api/auth/register').send({
 				phone: '5555553333', // Normalizes to same as existingPhone
-				name: 'Different Name',
+				firstName: 'Different',
+				lastName: 'Name',
 			});
 
 			expect(response.status).toBe(400);
@@ -208,16 +229,19 @@ describe('POST /api/auth/register', () => {
 		});
 
 		it('should not create duplicate user', async () => {
-			const usersBefore = readUsers().filter((u) => u.phone === existingPhone);
-			const countBefore = usersBefore.length;
+			const countBefore = await prisma.user.count({
+				where: { phone: existingPhone },
+			});
 
 			await request(app).post('/api/auth/register').send({
 				phone: existingPhone,
-				name: 'Another Name',
+				firstName: 'Another',
+				lastName: 'Name',
 			});
 
-			const usersAfter = readUsers().filter((u) => u.phone === existingPhone);
-			const countAfter = usersAfter.length;
+			const countAfter = await prisma.user.count({
+				where: { phone: existingPhone },
+			});
 
 			expect(countAfter).toBe(countBefore); // No new user created
 		});
@@ -229,13 +253,13 @@ describe('POST /api/auth/register', () => {
 			const phone2 = '+15555552222';
 			const phone3 = '+15555552223';
 
-			const response1 = await request(app).post('/api/auth/register').send({ phone: phone1, name: 'User 1' });
+			const response1 = await request(app).post('/api/auth/register').send({ phone: phone1, firstName: 'User', lastName: '1' });
 			expect(response1.status).toBe(200);
 
-			const response2 = await request(app).post('/api/auth/register').send({ phone: phone2, name: 'User 2' });
+			const response2 = await request(app).post('/api/auth/register').send({ phone: phone2, firstName: 'User', lastName: '2' });
 			expect(response2.status).toBe(200);
 
-			const response3 = await request(app).post('/api/auth/register').send({ phone: phone3, name: 'User 3' });
+			const response3 = await request(app).post('/api/auth/register').send({ phone: phone3, firstName: 'User', lastName: '3' });
 			expect(response3.status).toBe(200);
 		});
 
@@ -243,11 +267,11 @@ describe('POST /api/auth/register', () => {
 			const phone = '+15555552000';
 
 			// Successful registration increments rate limit
-			const response1 = await request(app).post('/api/auth/register').send({ phone, name: 'User 1' });
+			const response1 = await request(app).post('/api/auth/register').send({ phone, firstName: 'User', lastName: '1' });
 			expect(response1.status).toBe(200);
 
 			// Second attempt with same phone fails due to duplicate user (not rate limit)
-			const response2 = await request(app).post('/api/auth/register').send({ phone, name: 'User 1' });
+			const response2 = await request(app).post('/api/auth/register').send({ phone, firstName: 'User', lastName: '1' });
 			expect(response2.status).toBe(400);
 			expect(response2.body.error).toBe('User already exists with this phone number');
 		});
@@ -256,10 +280,10 @@ describe('POST /api/auth/register', () => {
 			const phone = '+15555551111';
 
 			// First registration succeeds
-			await request(app).post('/api/auth/register').send({ phone, name: 'User 1' });
+			await request(app).post('/api/auth/register').send({ phone, firstName: 'User', lastName: '1' });
 
 			// Second attempt with same phone but different name should fail
-			const response = await request(app).post('/api/auth/register').send({ phone, name: 'Different Name' });
+			const response = await request(app).post('/api/auth/register').send({ phone, firstName: 'Different', lastName: 'Name' });
 
 			expect(response.status).toBe(400);
 			expect(response.body.error).toBe('User already exists with this phone number');

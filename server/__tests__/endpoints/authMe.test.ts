@@ -1,34 +1,41 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import request from 'supertest';
 import app from '../../index';
-import { createUser, writeUsers, readUsers } from '../../userStorage';
+import { createUser } from '../../repositories/userRepository';
 import { generateSessionToken } from '../../auth';
 import { createMockUser } from '../utils/testHelpers';
+import { prisma } from '../../db';
 
 describe('GET /api/auth/me', () => {
-	const testUser = createMockUser({ name: 'Test User', phone: '+15555551234' });
+	const testUser = createMockUser({ firstName: 'Test', lastName: 'User', phone: '+15555551234' });
 	let userId: string;
 	let sessionToken: string;
 
-	beforeEach(() => {
+	beforeEach(async () => {
 		// Create test user
-		const user = createUser({
-			name: testUser.name,
+		const user = await createUser({
+			firstName: testUser.firstName,
+			lastName: testUser.lastName,
 			phone: testUser.phone,
 		});
 		userId = user.id;
 		sessionToken = generateSessionToken({
 			id: user.id,
 			phone: user.phone,
-			name: user.name,
+			firstName: user.firstName,
+			lastName: user.lastName,
 		});
 	});
 
-	afterEach(() => {
+	afterEach(async () => {
 		// Clean up test users
-		const users = readUsers();
-		const cleanedUsers = users.filter((u) => !u.phone.startsWith('+1555555'));
-		writeUsers(cleanedUsers);
+		await prisma.user.deleteMany({
+			where: {
+				phone: {
+					startsWith: '+1555555',
+				},
+			},
+		});
 	});
 
 	describe('Successful Authentication', () => {
@@ -38,7 +45,8 @@ describe('GET /api/auth/me', () => {
 			expect(response.status).toBe(200);
 			expect(response.body).toMatchObject({
 				id: userId,
-				name: testUser.name,
+				firstName: testUser.firstName,
+				lastName: testUser.lastName,
 				phone: testUser.phone,
 			});
 		});
@@ -47,7 +55,8 @@ describe('GET /api/auth/me', () => {
 			const response = await request(app).get('/api/auth/me').set('Authorization', `Bearer ${sessionToken}`);
 
 			expect(response.body).toHaveProperty('id');
-			expect(response.body).toHaveProperty('name');
+			expect(response.body).toHaveProperty('firstName');
+			expect(response.body).toHaveProperty('lastName');
 			expect(response.body).toHaveProperty('phone');
 			expect(response.body).toHaveProperty('createdAt');
 			expect(response.body).toHaveProperty('isActive');
@@ -104,9 +113,9 @@ describe('GET /api/auth/me', () => {
 	describe('User Not Found', () => {
 		it('should return 404 when user is deleted', async () => {
 			// Create a token for user, then delete the user
-			const users = readUsers();
-			const cleanedUsers = users.filter((u) => u.id !== userId);
-			writeUsers(cleanedUsers);
+			await prisma.user.delete({
+				where: { id: userId },
+			});
 
 			const response = await request(app).get('/api/auth/me').set('Authorization', `Bearer ${sessionToken}`);
 

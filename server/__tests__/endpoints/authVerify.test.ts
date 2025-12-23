@@ -1,28 +1,34 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import request from 'supertest';
 import app from '../../index';
-import { createUser, writeUsers, readUsers } from '../../userStorage';
+import { createUser } from '../../repositories/userRepository';
 import { generateMagicLinkToken, generateSessionToken } from '../../auth';
 import { createMockUser } from '../utils/testHelpers';
+import { prisma } from '../../db';
 
 describe('GET /api/auth/verify', () => {
-	const testUser = createMockUser({ name: 'Test User', phone: '+15555551234' });
+	const testUser = createMockUser({ firstName: 'Test', lastName: 'User', phone: '+15555551234' });
 	let userId: string;
 
-	beforeEach(() => {
+	beforeEach(async () => {
 		// Create test user
-		const user = createUser({
-			name: testUser.name,
+		const user = await createUser({
+			firstName: testUser.firstName,
+			lastName: testUser.lastName,
 			phone: testUser.phone,
 		});
 		userId = user.id;
 	});
 
-	afterEach(() => {
+	afterEach(async () => {
 		// Clean up test users
-		const users = readUsers();
-		const cleanedUsers = users.filter((u) => !u.phone.startsWith('+1555555'));
-		writeUsers(cleanedUsers);
+		await prisma.user.deleteMany({
+			where: {
+				phone: {
+					startsWith: '+1555555',
+				},
+			},
+		});
 	});
 
 	describe('Successful Verification', () => {
@@ -36,7 +42,8 @@ describe('GET /api/auth/verify', () => {
 			expect(response.body.sessionToken).toBeDefined();
 			expect(response.body.user).toEqual({
 				id: userId,
-				name: testUser.name,
+				firstName: testUser.firstName,
+				lastName: testUser.lastName,
 				phone: testUser.phone,
 			});
 		});
@@ -64,7 +71,8 @@ describe('GET /api/auth/verify', () => {
 
 			expect(response.body.user).toBeDefined();
 			expect(response.body.user.id).toBe(userId);
-			expect(response.body.user.name).toBe(testUser.name);
+			expect(response.body.user.firstName).toBe(testUser.firstName);
+			expect(response.body.user.lastName).toBe(testUser.lastName);
 			expect(response.body.user.phone).toBe(testUser.phone);
 		});
 	});
@@ -113,7 +121,8 @@ describe('GET /api/auth/verify', () => {
 			const sessionToken = generateSessionToken({
 				id: userId,
 				phone: testUser.phone,
-				name: testUser.name,
+				firstName: testUser.firstName,
+				lastName: testUser.lastName,
 			});
 
 			const response = await request(app).get(`/api/auth/verify?token=${sessionToken}`);

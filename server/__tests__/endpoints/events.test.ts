@@ -1,44 +1,51 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import request from 'supertest';
 import app from '../../index';
-import { createUser, writeUsers, readUsers } from '../../userStorage';
+import { createUser } from '../../repositories/userRepository';
 import { generateSessionToken } from '../../auth';
 import { createMockUser } from '../utils/testHelpers';
+import { prisma } from '../../db';
 import fs from 'fs';
 import path from 'path';
 
 const EVENTS_FILE = path.join(__dirname, '..', '..', '..', 'data', 'events.json');
 
 describe('Events API Endpoints', () => {
-	const testUser1 = createMockUser({ name: 'User 1', phone: '+15555551111' });
-	const testUser2 = createMockUser({ name: 'User 2', phone: '+15555552222' });
+	const testUser1 = createMockUser({ firstName: 'User', lastName: '1', phone: '+15555551111' });
+	const testUser2 = createMockUser({ firstName: 'User', lastName: '2', phone: '+15555552222' });
 	let user1Id: string;
 	let user2Id: string;
 	let user1Token: string;
 	let user2Token: string;
 
-	beforeEach(() => {
+	beforeEach(async () => {
 		// Create test users
-		const u1 = createUser({ name: testUser1.name, phone: testUser1.phone });
-		const u2 = createUser({ name: testUser2.name, phone: testUser2.phone });
+		const u1 = await createUser({ firstName: testUser1.firstName, lastName: testUser1.lastName, phone: testUser1.phone });
+		const u2 = await createUser({ firstName: testUser2.firstName, lastName: testUser2.lastName, phone: testUser2.phone });
 		user1Id = u1.id;
 		user2Id = u2.id;
-		user1Token = generateSessionToken({ id: u1.id, phone: u1.phone, name: u1.name });
-		user2Token = generateSessionToken({ id: u2.id, phone: u2.phone, name: u2.name });
+		user1Token = generateSessionToken({ id: u1.id, phone: u1.phone, firstName: u1.firstName, lastName: u1.lastName });
+		user2Token = generateSessionToken({ id: u2.id, phone: u2.phone, firstName: u2.firstName, lastName: u2.lastName });
 	});
 
-	afterEach(() => {
+	afterEach(async () => {
 		// Clean up test users
-		const users = readUsers();
-		const cleanedUsers = users.filter((u) => !u.phone.startsWith('+1555555'));
-		writeUsers(cleanedUsers);
+		await prisma.user.deleteMany({
+			where: {
+				phone: {
+					startsWith: '+1555555',
+				},
+			},
+		});
 
 		// Clean up events
-		if (fs.existsSync(EVENTS_FILE)) {
-			const events = JSON.parse(fs.readFileSync(EVENTS_FILE, 'utf8'));
-			const cleanedEvents = events.filter((e: any) => !e.userId || (e.userId !== user1Id && e.userId !== user2Id));
-			fs.writeFileSync(EVENTS_FILE, JSON.stringify(cleanedEvents, null, 2));
-		}
+		await prisma.event.deleteMany({
+			where: {
+				userId: {
+					in: [user1Id, user2Id],
+				},
+			},
+		});
 	});
 
 	describe('POST /api/events', () => {
@@ -110,11 +117,12 @@ describe('Events API Endpoints', () => {
 		});
 
 		it('should return empty array for user with no events', async () => {
-			const newUser = createUser({ name: 'New User', phone: '+15555553333' });
+			const newUser = await createUser({ firstName: 'New', lastName: 'User', phone: '+15555553333' });
 			const newUserToken = generateSessionToken({
 				id: newUser.id,
 				phone: newUser.phone,
-				name: newUser.name,
+				firstName: newUser.firstName,
+				lastName: newUser.lastName,
 			});
 
 			const response = await request(app).get('/api/events').set('Authorization', `Bearer ${newUserToken}`);

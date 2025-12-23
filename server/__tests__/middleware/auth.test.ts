@@ -35,13 +35,15 @@ describe('Auth Middleware', () => {
 			expect(req.user).toBeDefined();
 			expect(req.user?.id).toBe(mockUser.id);
 			expect(req.user?.phone).toBe(mockUser.phone);
-			expect(req.user?.name).toBe(mockUser.name);
+			expect(req.user?.firstName).toBe(mockUser.firstName);
+			expect(req.user?.lastName).toBe(mockUser.lastName);
 		});
 
 		it('should set req.user with decoded token payload', () => {
 			const mockUser = createMockUser({
 				id: 'test-123',
-				name: 'John Doe',
+				firstName: 'John',
+				lastName: 'Doe',
 				phone: '+15551234567',
 			});
 			const token = generateSessionToken(mockUser);
@@ -55,7 +57,8 @@ describe('Auth Middleware', () => {
 			expect(req.user).toEqual({
 				id: 'test-123',
 				phone: '+15551234567',
-				name: 'John Doe',
+				firstName: 'John',
+				lastName: 'Doe',
 			});
 		});
 
@@ -137,8 +140,8 @@ describe('Auth Middleware', () => {
 		});
 
 		it('should handle multiple requests independently', () => {
-			const user1 = createMockUser({ id: 'user-1', name: 'User One' });
-			const user2 = createMockUser({ id: 'user-2', name: 'User Two' });
+			const user1 = createMockUser({ id: 'user-1', firstName: 'User', lastName: 'One' });
+			const user2 = createMockUser({ id: 'user-2', firstName: 'User', lastName: 'Two' });
 			const token1 = generateSessionToken(user1);
 			const token2 = generateSessionToken(user2);
 

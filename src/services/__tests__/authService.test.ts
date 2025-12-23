@@ -139,14 +139,14 @@ describe('authService', () => {
 				json: async () => mockResponse,
 			});
 
-			const result = await registerUser('+15555551234', 'Test User');
+			const result = await registerUser('+15555551234', 'Test', 'User');
 
 			expect(fetchMock).toHaveBeenCalledWith(
 				'http://localhost:2999/api/auth/register',
 				expect.objectContaining({
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ phone: '+15555551234', name: 'Test User' }),
+					body: JSON.stringify({ phone: '+15555551234', firstName: 'Test', lastName: 'User' }),
 				}),
 			);
 			expect(result).toEqual(mockResponse);
@@ -157,7 +157,7 @@ describe('authService', () => {
 				json: async () => ({ success: true, message: 'Account created!' }),
 			});
 
-			const result = await registerUser('+15555559999', 'New User');
+			const result = await registerUser('+15555559999', 'New', 'User');
 
 			expect(result.success).toBe(true);
 		});

@@ -1,24 +1,29 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import request from 'supertest';
 import app from '../../index';
-import { createUser, writeUsers, readUsers } from '../../userStorage';
+import { createUser } from '../../repositories/userRepository';
 import { clearRateLimits } from '../../rateLimit';
 import { createMockUser } from '../utils/testHelpers';
+import { prisma } from '../../db';
 
 describe('POST /api/auth/request', () => {
 	const testPhone = '+15555551234';
-	const testUser = createMockUser({ phone: testPhone, name: 'Test User' });
+	const testUser = createMockUser({ phone: testPhone, firstName: 'Test', lastName: 'User' });
 
 	beforeEach(() => {
 		// Clear rate limits before each test
 		clearRateLimits();
 	});
 
-	afterEach(() => {
+	afterEach(async () => {
 		// Clean up test users
-		const users = readUsers();
-		const cleanedUsers = users.filter((u) => !u.phone.startsWith('+1555555'));
-		writeUsers(cleanedUsers);
+		await prisma.user.deleteMany({
+			where: {
+				phone: {
+					startsWith: '+1555555',
+				},
+			},
+		});
 		clearRateLimits();
 	});
 
@@ -80,10 +85,11 @@ describe('POST /api/auth/request', () => {
 	});
 
 	describe('Existing User Flow', () => {
-		beforeEach(() => {
+		beforeEach(async () => {
 			// Create a test user
-			createUser({
-				name: testUser.name,
+			await createUser({
+				firstName: testUser.firstName,
+				lastName: testUser.lastName,
 				phone: testUser.phone,
 			});
 		});
@@ -127,9 +133,10 @@ describe('POST /api/auth/request', () => {
 	});
 
 	describe('Rate Limiting', () => {
-		beforeEach(() => {
-			createUser({
-				name: testUser.name,
+		beforeEach(async () => {
+			await createUser({
+				firstName: testUser.firstName,
+				lastName: testUser.lastName,
 				phone: testUser.phone,
 			});
 		});
@@ -176,7 +183,7 @@ describe('POST /api/auth/request', () => {
 
 		it('should track rate limits independently for different phones', async () => {
 			const phone2 = '+15555557777';
-			createUser({ name: 'Another User', phone: phone2 });
+			await createUser({ firstName: 'Another', lastName: 'User', phone: phone2 });
 
 			// Exceed limit for first phone
 			await request(app).post('/api/auth/request').send({ phone: testPhone });

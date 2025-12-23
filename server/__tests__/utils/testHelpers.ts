@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { StoredUser } from '../../userStorage';
+import { StoredUser } from '../../repositories/userRepository';
 import fs from 'fs';
 import path from 'path';
 
@@ -19,7 +19,8 @@ export const createMockUser = (overrides?: Partial<StoredUser>): StoredUser => {
 	const timestamp = new Date().toISOString();
 	return {
 		id: uuidv4(),
-		name: 'Test User',
+		firstName: 'Test',
+		lastName: 'User',
 		phone: '+15555551234',
 		createdAt: timestamp,
 		updatedAt: timestamp,
@@ -74,7 +75,8 @@ export const getTestDataPath = (filename: string): string => {
  */
 export const createTestUser = (userData: Partial<StoredUser> = {}): StoredUser => {
 	return createMockUser({
-		name: userData.name || 'Test User',
+		firstName: userData.firstName || 'Test',
+		lastName: userData.lastName || 'User',
 		phone:
 			userData.phone ||
 			`+1555${Math.floor(Math.random() * 10000000)
