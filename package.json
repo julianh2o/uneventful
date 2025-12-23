@@ -25,14 +25,15 @@
     "yaml": "^2.8.2"
   },
   "scripts": {
+    "postinstall": "prisma generate",
     "dev": "concurrently -n client,server -c blue,green \"yarn dev:client\" \"yarn dev:server\"",
     "dev:client": "PORT=2998 react-scripts start",
-    "dev:server": "prisma migrate dev && NODE_ENV=development nodemon --watch server --ext ts --exec 'tsx server/index.ts'",
+    "dev:server": "prisma migrate dev && NODE_ENV=development nodemon --watch server --ext ts --watch prisma/schema.prisma --exec 'tsx server/index.ts'",
     "build": "BUILD_PATH=build/public react-scripts build",
-    "build:server": "tsc --project server/tsconfig.json && mkdir -p build && cp -r src/config build/",
+    "build:server": "prisma generate && tsc --project server/tsconfig.json && mkdir -p build && cp -r src/config build/",
     "build:local": "bash scripts/build-local.sh",
     "start": "NODE_ENV=production node build/index.js",
-    "preview": "yarn build:server && yarn build && yarn start",
+    "preview": "prisma migrate deploy && yarn build:server && yarn build && yarn start",
     "test": "yarn test:client && yarn test:server",
     "test:client": "vitest run --config vitest.config.ts",
     "test:server": "vitest run --config server/vitest.config.ts",

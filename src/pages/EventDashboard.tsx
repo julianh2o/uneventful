@@ -1,67 +1,20 @@
-import React, { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
-import {
-	Box,
-	CircularProgress,
-	Alert,
-	Typography,
-	Paper,
-	Chip,
-	List,
-	ListItem,
-	ListItemIcon,
-	ListItemText,
-	Collapse,
-	Button,
-	IconButton,
-} from '@mui/material';
-import {
-	ChevronRight as ChevronRightIcon,
-	Edit as EditIcon,
-	CheckCircle as CheckCircleIcon,
-	RadioButtonUnchecked as UncheckedIcon,
-} from '@mui/icons-material';
+import { Box, CircularProgress, Alert, Typography, Paper, Chip, Button } from '@mui/material';
+import { Edit as EditIcon } from '@mui/icons-material';
 import {
 	Event as EventIcon,
 	Person as PersonIcon,
 	Groups as GroupsIcon,
-	AccessTime as TimeIcon,
 	CalendarToday as CalendarIcon,
-	Email as ContactIcon,
-	Notes as NotesIcon,
 } from '@mui/icons-material';
-import ReactMarkdown from 'react-markdown';
 
 import { APP_TITLE } from '../utils/constants';
-import { getApiBaseUrl } from '../utils/api';
 import { useEvent } from '../hooks/useEvent';
 import { useTasks } from '../hooks/useTasks';
 import { useEventCountdown } from '../hooks/useEventCountdown';
-import { CatBat } from '../components/CatBat';
 import { NotificationToggle } from '../components/NotificationToggle';
-import { areAllSubtasksCompleted } from '../utils/taskHelpers';
-
-const parseEventDate = (dateStr?: string, timeStr?: string): Date | null => {
-	if (!dateStr) return null;
-	try {
-		const [month, day, year] = dateStr.split('/').map(Number);
-		let hours = 0;
-		let minutes = 0;
-		if (timeStr) {
-			const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)?/i);
-			if (match) {
-				hours = parseInt(match[1], 10);
-				minutes = parseInt(match[2], 10);
-				if (match[3]?.toUpperCase() === 'PM' && hours !== 12) hours += 12;
-				if (match[3]?.toUpperCase() === 'AM' && hours === 12) hours = 0;
-			}
-		}
-		return new Date(year, month - 1, day, hours, minutes);
-	} catch {
-		return null;
-	}
-};
+import { TaskDetail } from './TaskDetail';
 
 const CountdownDisplay = ({ days, hours }: { days: number; hours: number }) => {
 	const isUnder24Hours = days === 0;
@@ -96,24 +49,6 @@ const CountdownDisplay = ({ days, hours }: { days: number; hours: number }) => {
 	);
 };
 
-const InfoRow = ({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) => (
-	<ListItem sx={{ py: 0.5 }}>
-		<ListItemIcon sx={{ minWidth: 40 }}>{icon}</ListItemIcon>
-		<ListItemText
-			primary={
-				<Box component='span'>
-					<Typography component='span' color='text.secondary' variant='body2'>
-						{label}:{' '}
-					</Typography>
-					<Typography component='span' variant='body2' fontWeight='medium'>
-						{value}
-					</Typography>
-				</Box>
-			}
-		/>
-	</ListItem>
-);
-
 export const EventDashboard = () => {
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
@@ -122,17 +57,6 @@ export const EventDashboard = () => {
 	const { event, loading, error } = useEvent(id || '');
 	const { tasks } = useTasks();
 	const countdown = useEventCountdown(event?.data.eventDate, event?.data.eventTime);
-
-	// Local state for task management
-	const [completedTasks, setCompletedTasks] = useState<Set<string>>(new Set(event?.completedTasks || []));
-	const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set());
-
-	// Update completedTasks when event data changes
-	React.useEffect(() => {
-		if (event?.completedTasks) {
-			setCompletedTasks(new Set(event.completedTasks));
-		}
-	}, [event?.completedTasks]);
 
 	if (!id) {
 		return <Alert severity='error'>Event ID is missing</Alert>;
@@ -163,73 +87,6 @@ export const EventDashboard = () => {
 	}
 
 	const { data } = event;
-
-	const eventDate = parseEventDate(data.eventDate, data.eventTime);
-
-	const getTaskDueDate = (deadline: number): Date | null => {
-		if (!eventDate) return null;
-		const dueDate = new Date(eventDate);
-		dueDate.setDate(dueDate.getDate() - deadline);
-		return dueDate;
-	};
-
-	const isTaskOverdue = (deadline: number): boolean => {
-		const dueDate = getTaskDueDate(deadline);
-		if (!dueDate) return false;
-		return new Date() > dueDate;
-	};
-
-	const formatDueDate = (deadline: number): string => {
-		const dueDate = getTaskDueDate(deadline);
-		if (!dueDate) return '';
-		return dueDate.toLocaleDateString();
-	};
-
-	const formatRelativeDate = (deadline: number): string => {
-		const dueDate = getTaskDueDate(deadline);
-		if (!dueDate) return '';
-
-		const now = new Date();
-		const diffMs = dueDate.getTime() - now.getTime();
-		const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
-
-		if (diffDays === 0) return 'today';
-		if (diffDays === 1) return 'tomorrow';
-		if (diffDays === -1) return 'yesterday';
-		if (diffDays > 0) return `in ${diffDays} day${diffDays === 1 ? '' : 's'}`;
-		return `${Math.abs(diffDays)} day${Math.abs(diffDays) === 1 ? '' : 's'} ago`;
-	};
-
-	const toggleTask = async (taskKey: string) => {
-		const next = new Set(completedTasks);
-		if (next.has(taskKey)) {
-			next.delete(taskKey);
-		} else {
-			next.add(taskKey);
-		}
-		setCompletedTasks(next);
-
-		try {
-			await fetch(`${getApiBaseUrl()}/api/events/${id}/tasks`, {
-				method: 'PATCH',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ completedTasks: Array.from(next) }),
-			});
-		} catch {
-			// Revert on error
-			setCompletedTasks(completedTasks);
-		}
-	};
-
-	const toggleExpanded = (taskName: string) => {
-		const next = new Set(expandedTasks);
-		if (next.has(taskName)) {
-			next.delete(taskName);
-		} else {
-			next.add(taskName);
-		}
-		setExpandedTasks(next);
-	};
 
 	return (
 		<>
@@ -275,150 +132,73 @@ export const EventDashboard = () => {
 					<Typography variant='h3' fontWeight='bold' gutterBottom>
 						{data.eventName || 'Unnamed Event'}
 					</Typography>
-					<Chip
-						label={`Hosted by ${data.hostName || 'Unknown'}`}
-						sx={{ bgcolor: 'rgba(255,255,255,0.2)', color: 'white' }}
-						icon={<PersonIcon sx={{ color: 'white !important' }} />}
-					/>
 					{countdown.passed && (
-						<Box sx={{ mt: 2 }}>
+						<Box sx={{ mt: 2, mb: 2 }}>
 							<Chip label='Event is happening now or has passed' color='success' size='medium' />
 						</Box>
 					)}
+
+					{/* Condensed Event Details */}
+					<Box
+						sx={{
+							mt: 3,
+							pt: 3,
+							borderTop: '1px solid rgba(255,255,255,0.2)',
+							display: 'flex',
+							fontSize: '0.875rem',
+						}}>
+						{/* Date & Time */}
+						<Box
+							sx={{
+								flex: 1,
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'center',
+								gap: 0.75,
+							}}>
+							<CalendarIcon sx={{ fontSize: 18, opacity: 0.9 }} />
+							<Typography variant='body2' sx={{ opacity: 0.9 }}>
+								{data.eventDate || 'No date'}
+								{data.eventTime && ` at ${data.eventTime}`}
+							</Typography>
+						</Box>
+
+						{/* Host */}
+						<Box
+							sx={{
+								flex: 1,
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'center',
+								gap: 0.75,
+							}}>
+							<PersonIcon sx={{ fontSize: 18, opacity: 0.9 }} />
+							<Typography variant='body2' sx={{ opacity: 0.9 }}>
+								Hosted by {data.hostName || 'Unknown'}
+							</Typography>
+						</Box>
+
+						{/* Event Type & Party Size */}
+						<Box
+							sx={{
+								flex: 1,
+								display: 'flex',
+								alignItems: 'center',
+								justifyContent: 'center',
+								gap: 0.75,
+							}}>
+							<GroupsIcon sx={{ fontSize: 18, opacity: 0.9 }} />
+							<Typography variant='body2' sx={{ opacity: 0.9 }}>
+								{`${data.eventType || 'Event'}: ${data.partySize || 'Unknown'} attendees`}
+							</Typography>
+						</Box>
+					</Box>
 				</Paper>
 
-				{/* Event Details */}
-				<Paper sx={{ mb: 3 }}>
-					<List dense>
-						<InfoRow icon={<CalendarIcon color='primary' />} label='Date' value={data.eventDate || 'Not specified'} />
-						<InfoRow icon={<TimeIcon color='secondary' />} label='Time' value={data.eventTime || 'Not specified'} />
-						<InfoRow
-							icon={<GroupsIcon color='success' />}
-							label='Party Size'
-							value={data.partySize || 'Not specified'}
-						/>
-						<InfoRow icon={<PersonIcon color='info' />} label='Host' value={data.hostName || 'Not specified'} />
-						<InfoRow
-							icon={<ContactIcon color='warning' />}
-							label='Contact'
-							value={data.hostContact || 'Not specified'}
-						/>
-						{data.specialRequests && (
-							<InfoRow icon={<NotesIcon color='primary' />} label='Special Requests' value={data.specialRequests} />
-						)}
-					</List>
-				</Paper>
-
-				{/* Tasks Checklist */}
-				{tasks.length > 0 && (
-					<Paper sx={{ mb: 3, p: 2 }}>
-						<Typography variant='h6' gutterBottom>
-							Tasks
-						</Typography>
-						<List dense>
-							{tasks.map((task) => {
-								const isCompleted = areAllSubtasksCompleted(task.name, task.subtasks, data, completedTasks);
-								const overdue = isTaskOverdue(task.deadline) && !isCompleted;
-								const isExpanded = expandedTasks.has(task.name);
-								const hasDescription = Boolean(task.description);
-
-								return (
-									<React.Fragment key={task.name}>
-										<ListItem
-											component={Link}
-											to={`/event/${id}/task/${task.id}`}
-											sx={{
-												py: 0.5,
-												cursor: 'pointer',
-												textDecoration: 'none',
-												color: 'inherit',
-												'&:hover': {
-													bgcolor: 'action.hover',
-												},
-											}}
-											secondaryAction={
-												<CatBat enabled={overdue}>
-													<Chip
-														size='small'
-														label={formatRelativeDate(task.deadline)}
-														color={overdue ? 'error' : 'default'}
-														variant={overdue ? 'filled' : 'outlined'}
-														title={formatDueDate(task.deadline)}
-													/>
-												</CatBat>
-											}>
-											<ListItemIcon sx={{ minWidth: 40 }}>
-												{hasDescription ? (
-													<IconButton
-														size='small'
-														onClick={(e) => {
-															e.preventDefault();
-															e.stopPropagation();
-															toggleExpanded(task.name);
-														}}
-														sx={{
-															transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
-															transition: 'transform 0.2s',
-														}}>
-														<ChevronRightIcon />
-													</IconButton>
-												) : (
-													<IconButton
-														size='small'
-														onClick={(e) => {
-															e.preventDefault();
-															e.stopPropagation();
-															toggleTask(task.name);
-														}}>
-														{isCompleted ? (
-															<CheckCircleIcon color='success' fontSize='small' />
-														) : (
-															<UncheckedIcon fontSize='small' />
-														)}
-													</IconButton>
-												)}
-											</ListItemIcon>
-											<ListItemText
-												primary={
-													<Typography
-														variant='body2'
-														sx={{
-															textDecoration: isCompleted ? 'line-through' : 'none',
-															color: isCompleted ? 'text.secondary' : 'text.primary',
-															fontWeight: 'medium',
-														}}>
-														{task.name}
-													</Typography>
-												}
-												secondary={task.summary || task.description}
-											/>
-										</ListItem>
-
-										{/* Description */}
-										<Collapse in={isExpanded} timeout='auto' unmountOnExit>
-											{task.description && (
-												<Box
-													sx={{
-														pl: 7,
-														pr: 2,
-														pb: 1,
-														pt: 0.5,
-														'& p': { margin: '0.5em 0', fontSize: '0.875rem' },
-														'& ul, & ol': { margin: '0.5em 0', paddingLeft: '1.5em', fontSize: '0.875rem' },
-														'& a': { color: 'primary.main', textDecoration: 'underline' },
-														'& strong': { fontWeight: 'bold' },
-														color: 'text.secondary',
-													}}>
-													<ReactMarkdown>{task.description}</ReactMarkdown>
-												</Box>
-											)}
-										</Collapse>
-									</React.Fragment>
-								);
-							})}
-						</List>
-					</Paper>
-				)}
+				{/* Tasks */}
+				{tasks.map((task) => (
+					<TaskDetail key={task.id} eventId={id} taskId={task.id} defaultExpanded={false} />
+				))}
 
 				{/* Footer Info */}
 				<Typography variant='caption' color='text.secondary'>

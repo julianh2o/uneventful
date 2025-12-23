@@ -33,6 +33,12 @@ yarn test:server          # Server tests only
 yarn lint                 # Run ESLint
 yarn format              # Format with Prettier
 
+# Database (Prisma)
+yarn prisma:generate       # Generate Prisma client (auto-runs on postinstall)
+yarn prisma:migrate        # Create and apply new migration
+yarn prisma:migrate:deploy # Apply pending migrations (production)
+yarn prisma:studio         # Open Prisma Studio GUI
+
 # Deployment
 yarn deploy             # Deploy to melinoe server via SSH (requires root access)
 yarn watch-deploy       # Watch GitHub Actions workflow execution (requires gh CLI)
@@ -43,6 +49,18 @@ yarn release:local      # Manual: Build and push multi-platform Docker image to 
 ## Architecture
 
 For detailed information about the system architecture, directory structure, key patterns, API endpoints, and important files, see [ARCHITECTURE.md](ARCHITECTURE.md).
+
+## Database Management
+
+**Prisma Client Generation**
+- The Prisma client is automatically generated on `yarn install` (postinstall hook)
+- When schema changes are made, `yarn dev:server` automatically runs migrations and regenerates the client
+- Nodemon watches `prisma/schema.prisma` and restarts the server when it changes
+
+**Important Notes**
+- If you manually edit `prisma/schema.prisma`, the dev server will auto-restart
+- After pulling schema changes from git, run `yarn install` or `yarn prisma:generate` to update the client
+- The server MUST be restarted after Prisma client regeneration to avoid schema inconsistencies
 
 ## Deployment
 
