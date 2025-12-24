@@ -147,11 +147,18 @@ export const TaskDetail = ({
 					<ExpandMoreIcon />
 				</IconButton>
 
-				<Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2, pr: 6 }}>
-					<TaskIcon sx={{ fontSize: 40 }} />
-					<Typography variant='h4' fontWeight='bold'>
-						{task.name}
-					</Typography>
+				<Box sx={{ mb: 2, pr: 6 }}>
+					<Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: task.summary ? 1 : 0 }}>
+						<TaskIcon sx={{ fontSize: 40 }} />
+						<Typography variant='h5' fontWeight='bold'>
+							{task.name}
+						</Typography>
+					</Box>
+					{task.summary && (
+						<Typography variant='body1' sx={{ color: 'rgba(255,255,255,0.85)', ml: 7 }}>
+							{task.summary}
+						</Typography>
+					)}
 				</Box>
 
 				{/* Chips */}
@@ -212,7 +219,7 @@ export const TaskDetail = ({
 
 			{/* Collapsible Content Section (Description + Subtasks) */}
 			<Collapse in={isExpanded}>
-				<Box sx={{ p: 4, bgcolor: 'background.paper' }}>
+				<Box sx={{ pt: 2, px: 4, pb: 4, bgcolor: 'background.paper' }}>
 					{/* Description */}
 					<Box
 						sx={{

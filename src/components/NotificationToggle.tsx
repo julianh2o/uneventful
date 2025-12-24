@@ -1,15 +1,15 @@
 import { useState, useEffect } from 'react';
-import { IconButton, Tooltip, CircularProgress } from '@mui/material';
+import { Button, Tooltip, CircularProgress } from '@mui/material';
 import { Notifications, NotificationsOff } from '@mui/icons-material';
 import { apiClient } from '../utils/apiClient';
 
 interface NotificationToggleProps {
 	eventId: string;
 	size?: 'small' | 'medium' | 'large';
-	color?: 'inherit' | 'default' | 'primary' | 'secondary';
+	color?: 'inherit' | 'primary' | 'secondary' | 'success' | 'error' | 'info' | 'warning';
 }
 
-export const NotificationToggle = ({ eventId, size = 'medium', color = 'default' }: NotificationToggleProps) => {
+export const NotificationToggle = ({ eventId, size = 'medium', color = 'inherit' }: NotificationToggleProps) => {
 	const [subscribed, setSubscribed] = useState<boolean | null>(null);
 	const [loading, setLoading] = useState(false);
 
@@ -56,22 +56,25 @@ export const NotificationToggle = ({ eventId, size = 'medium', color = 'default'
 
 	return (
 		<Tooltip title={subscribed ? 'Disable notifications' : 'Enable notifications'} arrow>
-			<IconButton
+			<Button
 				onClick={(e) => {
 					e.stopPropagation(); // Prevent triggering parent click events
 					toggleSubscription();
 				}}
 				size={size}
 				color={color}
-				disabled={loading}>
-				{loading ? (
-					<CircularProgress size={size === 'small' ? 16 : size === 'large' ? 28 : 20} />
-				) : subscribed ? (
-					<Notifications />
-				) : (
-					<NotificationsOff />
-				)}
-			</IconButton>
+				disabled={loading}
+				startIcon={
+					loading ? (
+						<CircularProgress size={size === 'small' ? 16 : size === 'large' ? 28 : 20} />
+					) : subscribed ? (
+						<Notifications />
+					) : (
+						<NotificationsOff />
+					)
+				}>
+				Notify
+			</Button>
 		</Tooltip>
 	);
 };
